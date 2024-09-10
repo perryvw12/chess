@@ -13,8 +13,8 @@ public class ChessPiece {
     private ChessPiece.PieceType type;
 
     public ChessPiece(ChessGame.TeamColor pieceColor, ChessPiece.PieceType type) {
-    this.pieceColor = pieceColor;
-    this.type = type;
+        this.pieceColor = pieceColor;
+        this.type = type;
 
     }
 
@@ -34,14 +34,14 @@ public class ChessPiece {
      * @return Which team this chess piece belongs to
      */
     public ChessGame.TeamColor getTeamColor() {
-        return this.pieceColor;
+        return pieceColor;
     }
 
     /**
      * @return which type of chess piece this piece is
      */
     public PieceType getPieceType() {
-        return this.type;
+        return type;
     }
 
     /**
