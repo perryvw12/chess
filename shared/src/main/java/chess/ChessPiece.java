@@ -54,7 +54,30 @@ public class ChessPiece {
      * @return Collection of valid moves
      */
     public Collection<ChessMove> pieceMoves(ChessBoard board, ChessPosition myPosition) {
-        return new ArrayList<ChessMove>();
+        Collection<ChessMove> moves = new ArrayList<ChessMove>();
+
+        switch (type) {
+            case BISHOP: {
+                ChessPosition new_position = new ChessPosition(2, 7);
+                moves.add(new ChessMove(myPosition, new_position, null));
+            }
+            case KING: {
+
+            }
+            case KNIGHT: {
+
+            }
+            case PAWN: {
+
+            }
+            case QUEEN: {
+
+            }
+            case ROOK: {
+
+            }
+        }
+        return moves;
     }
 
     @Override
