@@ -74,7 +74,26 @@ public class ChessPiece {
 
             }
             case ROOK: {
-
+                //vertical movement up
+                for (int i = 1 + myPosition.getColumn(); i <= 8; i++) {
+                    ChessPosition new_position = new ChessPosition(myPosition.getRow(), i);
+                    moves.add(new ChessMove(myPosition, new_position, null));
+                }
+                //vertical movement down
+                for (int i = myPosition.getColumn() - 1; i >= 1; i--) {
+                    ChessPosition new_position = new ChessPosition(myPosition.getRow(), i);
+                    moves.add(new ChessMove(myPosition, new_position, null));
+                }
+                //horizontal movement left
+                for (int i = myPosition.getRow() - 1; i >= 1; i--) {
+                    ChessPosition new_position = new ChessPosition(i, myPosition.getColumn());
+                    moves.add(new ChessMove(myPosition, new_position, null));
+                }
+                //horizontal movement right
+                for (int i = myPosition.getRow() + 1; i <= 8; i++) {
+                    ChessPosition new_position = new ChessPosition(i, myPosition.getColumn());
+                    moves.add(new ChessMove(myPosition, new_position, null));
+                }
             }
         }
         return moves;
