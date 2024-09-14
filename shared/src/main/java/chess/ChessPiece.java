@@ -68,7 +68,24 @@ public class ChessPiece {
 
             }
             case PAWN: {
+                if (pieceColor == ChessGame.TeamColor.WHITE) {
+                    ChessPosition new_position = new ChessPosition((myPosition.getRow() + 1), myPosition.getColumn());
+                    moves.add(new ChessMove(myPosition, new_position, null));
+                    if(myPosition.getRow() == 2) {
+                        new_position = new ChessPosition((myPosition.getRow() + 2), myPosition.getColumn());
+                        moves.add(new ChessMove(myPosition, new_position, null));
 
+                    }
+                }
+                if (pieceColor == ChessGame.TeamColor.BLACK) {
+                    ChessPosition new_position = new ChessPosition((myPosition.getRow() - 1), myPosition.getColumn());
+                    moves.add(new ChessMove(myPosition, new_position, null));
+                    if(myPosition.getRow() == 7) {
+                        new_position = new ChessPosition((myPosition.getRow() - 2), myPosition.getColumn());
+                        moves.add(new ChessMove(myPosition, new_position, null));
+                    }
+                }
+                return moves;
             }
             case QUEEN: {
 
@@ -93,6 +110,8 @@ public class ChessPiece {
                 for (int i = myPosition.getRow() + 1; i <= 8; i++) {
                     ChessPosition new_position = new ChessPosition(i, myPosition.getColumn());
                     moves.add(new ChessMove(myPosition, new_position, null));
+
+                return moves;
                 }
             }
         }
