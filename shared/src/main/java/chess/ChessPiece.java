@@ -57,40 +57,80 @@ public class ChessPiece {
         Collection<ChessMove> moves = new ArrayList<ChessMove>();
 
         switch (type) {
-            case BISHOP: {
-                ChessPosition new_position = new ChessPosition(2, 7);
+            case PieceType.BISHOP: {
+                break;
+            }
+
+            case PieceType.KING: {
+                //move left
+                ChessPosition new_position = new ChessPosition(myPosition.getRow(), myPosition.getColumn() - 1);
                 moves.add(new ChessMove(myPosition, new_position, null));
-            }
-            case KING: {
 
-            }
-            case KNIGHT: {
+                //move left down
+                new_position = new ChessPosition(myPosition.getRow() - 1, myPosition.getColumn() - 1);
+                moves.add(new ChessMove(myPosition, new_position, null));
 
+                //move left up
+                new_position = new ChessPosition(myPosition.getRow() + 1, myPosition.getColumn() - 1);
+                moves.add(new ChessMove(myPosition, new_position, null));
+
+                //move right
+                new_position = new ChessPosition(myPosition.getRow(), myPosition.getColumn() + 1);
+                moves.add(new ChessMove(myPosition, new_position, null));
+
+                //move right down
+                new_position = new ChessPosition(myPosition.getRow() - 1, myPosition.getColumn() + 1);
+                moves.add(new ChessMove(myPosition, new_position, null));
+
+                //move right up
+                new_position = new ChessPosition(myPosition.getRow() + 1, myPosition.getColumn() + 1);
+                moves.add(new ChessMove(myPosition, new_position, null));
+
+                //move up
+                new_position = new ChessPosition(myPosition.getRow() + 1, myPosition.getColumn());
+                moves.add(new ChessMove(myPosition, new_position, null));
+
+                //move down
+                new_position = new ChessPosition(myPosition.getRow() - 1, myPosition.getColumn());
+                moves.add(new ChessMove(myPosition, new_position, null));
+                break;
             }
-            case PAWN: {
+            case PieceType.KNIGHT: {
+                break;
+            }
+
+            case PieceType.PAWN: {
+                //moves for white pawn
                 if (pieceColor == ChessGame.TeamColor.WHITE) {
                     ChessPosition new_position = new ChessPosition((myPosition.getRow() + 1), myPosition.getColumn());
                     moves.add(new ChessMove(myPosition, new_position, null));
+
+                    //checks if pawn is on original square
                     if(myPosition.getRow() == 2) {
                         new_position = new ChessPosition((myPosition.getRow() + 2), myPosition.getColumn());
                         moves.add(new ChessMove(myPosition, new_position, null));
 
                     }
                 }
+
+                //moves for black pawn
                 if (pieceColor == ChessGame.TeamColor.BLACK) {
                     ChessPosition new_position = new ChessPosition((myPosition.getRow() - 1), myPosition.getColumn());
                     moves.add(new ChessMove(myPosition, new_position, null));
+
+                    //checks if pawn is on original square
                     if(myPosition.getRow() == 7) {
                         new_position = new ChessPosition((myPosition.getRow() - 2), myPosition.getColumn());
                         moves.add(new ChessMove(myPosition, new_position, null));
                     }
                 }
-                return moves;
+                break;
             }
-            case QUEEN: {
+            case PieceType.QUEEN: {
+                break;
+            }
 
-            }
-            case ROOK: {
+            case PieceType.ROOK: {
                 //vertical movement up
                 for (int i = 1 + myPosition.getColumn(); i <= 8; i++) {
                     ChessPosition new_position = new ChessPosition(myPosition.getRow(), i);
@@ -110,9 +150,8 @@ public class ChessPiece {
                 for (int i = myPosition.getRow() + 1; i <= 8; i++) {
                     ChessPosition new_position = new ChessPosition(i, myPosition.getColumn());
                     moves.add(new ChessMove(myPosition, new_position, null));
-
-                return moves;
                 }
+                break;
             }
         }
         return moves;
