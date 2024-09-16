@@ -11,8 +11,8 @@ import java.util.Objects;
  * signature of the existing methods.
  */
 public class ChessPiece {
-    private ChessGame.TeamColor pieceColor;
-    private ChessPiece.PieceType type;
+    private final ChessGame.TeamColor pieceColor;
+    private final ChessPiece.PieceType type;
 
     public ChessPiece(ChessGame.TeamColor pieceColor, ChessPiece.PieceType type) {
         this.pieceColor = pieceColor;
@@ -54,7 +54,7 @@ public class ChessPiece {
      * @return Collection of valid moves
      */
     public Collection<ChessMove> pieceMoves(ChessBoard board, ChessPosition myPosition) {
-        Collection<ChessMove> moves = new ArrayList<ChessMove>();
+        Collection<ChessMove> moves = new ArrayList<>();
 
         switch (type) {
             case PieceType.BISHOP: {
@@ -108,6 +108,7 @@ public class ChessPiece {
                     //checks if pawn is on original square
                     if(myPosition.getRow() == 2) {
                         new_position = new ChessPosition((myPosition.getRow() + 2), myPosition.getColumn());
+
                         moves.add(new ChessMove(myPosition, new_position, null));
 
                     }
@@ -132,25 +133,61 @@ public class ChessPiece {
 
             case PieceType.ROOK: {
                 //vertical movement up
-                for (int i = 1 + myPosition.getColumn(); i <= 8; i++) {
+                for (int i = myPosition.getColumn() + 1; i <= 8; i++) {
                     ChessPosition new_position = new ChessPosition(myPosition.getRow(), i);
-                    moves.add(new ChessMove(myPosition, new_position, null));
+                    ChessPiece piece_at_new_position = board.getPiece(new_position);
+                    if(piece_at_new_position == null) {
+                        moves.add(new ChessMove(myPosition, new_position, null));
+                    } else {
+                        if (piece_at_new_position.getTeamColor() != pieceColor) {
+                            moves.add(new ChessMove(myPosition, new_position, null));
+                        }
+                        break;
+                    }
                 }
+
                 //vertical movement down
                 for (int i = myPosition.getColumn() - 1; i >= 1; i--) {
                     ChessPosition new_position = new ChessPosition(myPosition.getRow(), i);
-                    moves.add(new ChessMove(myPosition, new_position, null));
+                    ChessPiece piece_at_new_position = board.getPiece(new_position);
+                    if(piece_at_new_position == null) {
+                        moves.add(new ChessMove(myPosition, new_position, null));
+                    } else {
+                        if (piece_at_new_position.getTeamColor() != pieceColor) {
+                            moves.add(new ChessMove(myPosition, new_position, null));
+                        }
+                        break;
+                    }
                 }
+
                 //horizontal movement left
                 for (int i = myPosition.getRow() - 1; i >= 1; i--) {
                     ChessPosition new_position = new ChessPosition(i, myPosition.getColumn());
-                    moves.add(new ChessMove(myPosition, new_position, null));
+                    ChessPiece piece_at_new_position = board.getPiece(new_position);
+                    if(piece_at_new_position == null) {
+                        moves.add(new ChessMove(myPosition, new_position, null));
+                    } else {
+                        if (piece_at_new_position.getTeamColor() != pieceColor) {
+                            moves.add(new ChessMove(myPosition, new_position, null));
+                        }
+                        break;
+                    }
                 }
+
                 //horizontal movement right
                 for (int i = myPosition.getRow() + 1; i <= 8; i++) {
                     ChessPosition new_position = new ChessPosition(i, myPosition.getColumn());
-                    moves.add(new ChessMove(myPosition, new_position, null));
+                    ChessPiece piece_at_new_position = board.getPiece(new_position);
+                    if(piece_at_new_position == null) {
+                        moves.add(new ChessMove(myPosition, new_position, null));
+                    } else {
+                        if (piece_at_new_position.getTeamColor() != pieceColor) {
+                            moves.add(new ChessMove(myPosition, new_position, null));
+                        }
+                        break;
+                    }
                 }
+
                 break;
             }
         }
