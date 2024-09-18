@@ -72,20 +72,21 @@ public class ChessPiece {
             while(true) {
                 row += row_move;
                 col += col_move;
-
                 if (row < 1 || row > 8 || col < 1 || col > 8) {
                     break;
                 }
 
                 ChessPosition new_position = new ChessPosition(row, col);
                 ChessPiece piece_at_new_position = board.getPiece(new_position);
-                if(piece_at_new_position == null) {
+
+                if (piece_at_new_position == null) {
                     moves.add(new ChessMove(myPosition, new_position, null));
                 } else {
-                    if (piece_at_new_position.getTeamColor() != this.pieceColor) {
+                    if (piece_at_new_position.getTeamColor() != pieceColor) {
                         moves.add(new ChessMove(myPosition, new_position, null));
                         break;
                     }
+                    break;
                 }
             }
         }
@@ -244,12 +245,12 @@ public class ChessPiece {
             case PieceType.QUEEN: {
                 //move right
                 move_adder(board, myPosition, 0, 1, true, moves);
+                //move left
+                move_adder(board, myPosition, 0, -1, true, moves);
                 //move up
                 move_adder(board, myPosition, 1, 0, true, moves);
                 //move down
                 move_adder(board, myPosition, -1, 0, true, moves);
-                //move left
-                move_adder(board, myPosition, 0, -1, true, moves);
                 //move up right
                 move_adder(board, myPosition, 1, 1, true, moves);
                 //move up left
