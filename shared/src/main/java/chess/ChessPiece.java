@@ -47,7 +47,7 @@ public class ChessPiece {
     }
 
     //A helper function that adds specified moves to a collection of chess moves//
-    protected void move_adder (ChessBoard board, ChessPosition myPosition, int row_move, int col_move, boolean repetitive, Collection<ChessMove> moves) {
+    private void move_adder (ChessBoard board, ChessPosition myPosition, int row_move, int col_move, boolean repetitive, Collection<ChessMove> moves) {
         int row = myPosition.getRow();
         int col = myPosition.getColumn();
 
@@ -92,94 +92,87 @@ public class ChessPiece {
         }
     }
 
-    /**
-     * Calculates all the positions a chess piece can move to
-     * Does not take into account moves that are illegal due to leaving the king in
-     * danger
-     *
-     * @return Collection of valid moves
-     */
+    private void pawn_mover (ChessBoard board, ChessPosition myPosition, int direction,  Collection<ChessMove> moves) {
+        int row = myPosition.getRow();
+        int col = myPosition.getColumn();
+        int new_row = row + direction;
+
+        ChessPosition new_pos = new ChessPosition(new_row, col);
+        ChessPiece piece_at_new_pos = board.getPiece(new_pos);
+
+        if (piece_at_new_pos == null) {
+            //move 1 space
+            if(new_row == 8 || new_row == 1) {
+                for(PieceType pieces : PieceType.values()) {
+                    if (pieces == PieceType.KING || pieces == PieceType.PAWN) {
+                        continue;
+                    } else {
+                        moves.add(new ChessMove(myPosition, new_pos, pieces));
+                    }
+                }
+                return;
+            } else {
+                moves.add(new ChessMove(myPosition, new_pos, null));
+            }
+
+            //move 2 spaces
+            ChessPosition double_move = new ChessPosition((new_row + direction), col);
+            ChessPiece piece_at_double = board.getPiece(double_move);
+            if((direction == 1 & row == 2) || (direction == -1 & row == 7)) {
+                if (piece_at_double == null) {
+                    moves.add(new ChessMove(myPosition, double_move, null));
+                }
+            }
+        }
+    }
+
+    private void pawn_attack (ChessBoard board, ChessPosition myPosition, int row_move, int col_move, Collection<ChessMove> moves) {
+        int row = myPosition.getRow();
+        int col = myPosition.getColumn();
+
+        ChessPosition new_pos = new ChessPosition(row + row_move, col + col_move);
+
+        if(new_pos.getColumn() >= 1 & new_pos.getColumn() <= 8) {
+            ChessPiece piece_at_pos = board.getPiece(new_pos);
+
+            if(piece_at_pos != null) {
+                if(piece_at_pos.getTeamColor() != pieceColor) {
+                    if(new_pos.getRow() == 8 || new_pos.getRow() == 1) {
+                        for (PieceType pieces : PieceType.values()) {
+                            if (pieces == PieceType.KING || pieces == PieceType.PAWN) {
+                                continue;
+                            } else {
+                                moves.add(new ChessMove(myPosition, new_pos, pieces));
+                            }
+                        }
+                    } else {
+                        moves.add(new ChessMove(myPosition, new_pos, null));
+                    }
+                }
+            }
+        }
+    }
+
+        /**
+         * Calculates all the positions a chess piece can move to
+         * Does not take into account moves that are illegal due to leaving the king in
+         * danger
+         *
+         * @return Collection of valid moves
+         */
     public Collection<ChessMove> pieceMoves(ChessBoard board, ChessPosition myPosition) {
         Collection<ChessMove> moves = new ArrayList<>();
 
         switch (type) {
             case PieceType.BISHOP: {
-                //move up left
-                int i = myPosition.getRow() + 1;
-                int j = myPosition.getColumn() - 1;
-
-                while(i <= 8 & j >= 1) {
-                    ChessPosition new_position = new ChessPosition(i, j);
-                    ChessPiece piece_at_new_position = board.getPiece(new_position);
-                    if(piece_at_new_position == null) {
-                        moves.add(new ChessMove(myPosition, new_position, null));
-                        i++;
-                        j--;
-                    } else {
-                        if (piece_at_new_position.getTeamColor() != pieceColor) {
-                            moves.add(new ChessMove(myPosition, new_position, null));
-                        }
-                        break;
-                    }
-                }
-
                 //move up right
-                i = myPosition.getRow() + 1;
-                j = myPosition.getColumn() + 1;
-
-                while(i <= 8 & j <= 8) {
-                    ChessPosition new_position = new ChessPosition(i, j);
-                    ChessPiece piece_at_new_position = board.getPiece(new_position);
-                    if(piece_at_new_position == null) {
-                        moves.add(new ChessMove(myPosition, new_position, null));
-                        i++;
-                        j++;
-                    } else {
-                        if (piece_at_new_position.getTeamColor() != pieceColor) {
-                            moves.add(new ChessMove(myPosition, new_position, null));
-                        }
-                        break;
-                    }
-                }
-
-                //move down left
-                i = myPosition.getRow() - 1;
-                j = myPosition.getColumn() - 1;
-
-                while(i >= 1 & j >= 1) {
-                    ChessPosition new_position = new ChessPosition(i, j);
-                    ChessPiece piece_at_new_position = board.getPiece(new_position);
-                    if(piece_at_new_position == null) {
-                        moves.add(new ChessMove(myPosition, new_position, null));
-                        i--;
-                        j--;
-                    } else {
-                        if (piece_at_new_position.getTeamColor() != pieceColor) {
-                            moves.add(new ChessMove(myPosition, new_position, null));
-                        }
-                        break;
-                    }
-                }
-
+                move_adder(board, myPosition, 1, 1, true, moves);
+                //move up left
+                move_adder(board, myPosition, 1, -1, true, moves);
                 //move down right
-                i = myPosition.getRow() - 1;
-                j = myPosition.getColumn() + 1;
-
-                while(i >= 1 & j <= 8) {
-                    ChessPosition new_position = new ChessPosition(i, j);
-                    ChessPiece piece_at_new_position = board.getPiece(new_position);
-                    if(piece_at_new_position == null) {
-                        moves.add(new ChessMove(myPosition, new_position, null));
-                        i--;
-                        j++;
-                    } else {
-                        if (piece_at_new_position.getTeamColor() != pieceColor) {
-                            moves.add(new ChessMove(myPosition, new_position, null));
-                        }
-                        break;
-                    }
-                }
-
+                move_adder(board, myPosition, -1, 1, true, moves);
+                //move down left
+                move_adder(board, myPosition, -1, -1, true, moves);
                 break;
             }
 
@@ -217,28 +210,16 @@ public class ChessPiece {
             case PieceType.PAWN: {
                 //moves for white pawn
                 if (pieceColor == ChessGame.TeamColor.WHITE) {
-                    ChessPosition new_position = new ChessPosition((myPosition.getRow() + 1), myPosition.getColumn());
-                    moves.add(new ChessMove(myPosition, new_position, null));
-
-                    //checks if pawn is on original square
-                    if(myPosition.getRow() == 2) {
-                        new_position = new ChessPosition((myPosition.getRow() + 2), myPosition.getColumn());
-
-                        moves.add(new ChessMove(myPosition, new_position, null));
-
-                    }
+                    pawn_mover(board, myPosition, 1,  moves);
+                    pawn_attack(board, myPosition, 1, 1, moves);
+                    pawn_attack(board, myPosition, 1, -1, moves);
                 }
 
                 //moves for black pawn
                 if (pieceColor == ChessGame.TeamColor.BLACK) {
-                    ChessPosition new_position = new ChessPosition((myPosition.getRow() - 1), myPosition.getColumn());
-                    moves.add(new ChessMove(myPosition, new_position, null));
-
-                    //checks if pawn is on original square
-                    if(myPosition.getRow() == 7) {
-                        new_position = new ChessPosition((myPosition.getRow() - 2), myPosition.getColumn());
-                        moves.add(new ChessMove(myPosition, new_position, null));
-                    }
+                    pawn_mover(board, myPosition, -1,  moves);
+                    pawn_attack(board, myPosition, -1, 1, moves);
+                    pawn_attack(board, myPosition, -1, -1, moves);
                 }
                 break;
             }
@@ -263,62 +244,14 @@ public class ChessPiece {
             }
 
             case PieceType.ROOK: {
-                //vertical movement up
-                for (int i = myPosition.getColumn() + 1; i <= 8; i++) {
-                    ChessPosition new_position = new ChessPosition(myPosition.getRow(), i);
-                    ChessPiece piece_at_new_position = board.getPiece(new_position);
-                    if(piece_at_new_position == null) {
-                        moves.add(new ChessMove(myPosition, new_position, null));
-                    } else {
-                        if (piece_at_new_position.getTeamColor() != pieceColor) {
-                            moves.add(new ChessMove(myPosition, new_position, null));
-                        }
-                        break;
-                    }
-                }
-
-                //vertical movement down
-                for (int i = myPosition.getColumn() - 1; i >= 1; i--) {
-                    ChessPosition new_position = new ChessPosition(myPosition.getRow(), i);
-                    ChessPiece piece_at_new_position = board.getPiece(new_position);
-                    if(piece_at_new_position == null) {
-                        moves.add(new ChessMove(myPosition, new_position, null));
-                    } else {
-                        if (piece_at_new_position.getTeamColor() != pieceColor) {
-                            moves.add(new ChessMove(myPosition, new_position, null));
-                        }
-                        break;
-                    }
-                }
-
-                //horizontal movement left
-                for (int i = myPosition.getRow() - 1; i >= 1; i--) {
-                    ChessPosition new_position = new ChessPosition(i, myPosition.getColumn());
-                    ChessPiece piece_at_new_position = board.getPiece(new_position);
-                    if(piece_at_new_position == null) {
-                        moves.add(new ChessMove(myPosition, new_position, null));
-                    } else {
-                        if (piece_at_new_position.getTeamColor() != pieceColor) {
-                            moves.add(new ChessMove(myPosition, new_position, null));
-                        }
-                        break;
-                    }
-                }
-
-                //horizontal movement right
-                for (int i = myPosition.getRow() + 1; i <= 8; i++) {
-                    ChessPosition new_position = new ChessPosition(i, myPosition.getColumn());
-                    ChessPiece piece_at_new_position = board.getPiece(new_position);
-                    if(piece_at_new_position == null) {
-                        moves.add(new ChessMove(myPosition, new_position, null));
-                    } else {
-                        if (piece_at_new_position.getTeamColor() != pieceColor) {
-                            moves.add(new ChessMove(myPosition, new_position, null));
-                        }
-                        break;
-                    }
-                }
-
+                //move right
+                move_adder(board, myPosition, 0, 1, true, moves);
+                //move left
+                move_adder(board, myPosition, 0, -1, true, moves);
+                //move up
+                move_adder(board, myPosition, 1, 0, true, moves);
+                //move down
+                move_adder(board, myPosition, -1, 0, true, moves);
                 break;
             }
         }
