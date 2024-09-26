@@ -1,6 +1,7 @@
 package chess;
 
 import java.util.Collection;
+import java.util.Objects;
 
 /**
  * For a class that can manage a chess game, making moves on a board
@@ -10,7 +11,7 @@ import java.util.Collection;
  */
 public class ChessGame {
     private TeamColor turn = TeamColor.WHITE;
-    private ChessBoard board;
+    private ChessBoard board = new ChessBoard();
 
     public ChessGame() {
 
@@ -70,7 +71,7 @@ public class ChessGame {
         for (int row = 1; row <= 8; row++) {
             for (int col = 1; col <= 8; col++) {
                 ChessPosition pos = new ChessPosition(row, col);
-                ChessPiece piece = board.getPiece(pos);
+                ChessPiece piece = getBoard().getPiece(pos);
                 if(piece != null) {
                     if (piece.getPieceType() == ChessPiece.PieceType.KING & piece.getTeamColor() == teamColor) {
                         return pos;
@@ -93,11 +94,11 @@ public class ChessGame {
         for (int row = 1; row <= 8; row++) {
             for (int col = 1; col <= 8; col++) {
                 ChessPosition pos = new ChessPosition(row, col);
-                ChessPiece piece = board.getPiece(pos);
+                ChessPiece piece = getBoard().getPiece(pos);
 
                 if (piece != null) {
                     if (piece.getTeamColor() != teamColor) {
-                        Collection<ChessMove> move_lst = piece.pieceMoves(board, pos);
+                        Collection<ChessMove> move_lst = piece.pieceMoves(getBoard(), pos);
                         for(ChessMove move : move_lst) {
                             if(move.getEndPosition() == king_pos) {
                                 return true;
