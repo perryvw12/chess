@@ -68,14 +68,18 @@ public class ChessGame {
     }
 
     private ChessPosition find_my_king(TeamColor teamColor) {
+        ChessPosition pos;
+        ChessPiece piece;
         for (int row = 1; row <= 8; row++) {
             for (int col = 1; col <= 8; col++) {
-                ChessPosition pos = new ChessPosition(row, col);
-                ChessPiece piece = getBoard().getPiece(pos);
-                if(piece != null) {
-                    if (piece.getPieceType() == ChessPiece.PieceType.KING && piece.getTeamColor() == teamColor) {
-                        return pos;
-                    }
+                pos = new ChessPosition(row, col);
+                piece = getBoard().getPiece(pos);
+
+                if(piece == null) {
+                    continue;
+                }
+                if (piece.getPieceType() == ChessPiece.PieceType.KING && piece.getTeamColor() == teamColor) {
+                    return pos;
                 }
             }
         }
