@@ -73,7 +73,7 @@ public class ChessGame {
                 ChessPosition pos = new ChessPosition(row, col);
                 ChessPiece piece = getBoard().getPiece(pos);
                 if(piece != null) {
-                    if (piece.getPieceType() == ChessPiece.PieceType.KING & piece.getTeamColor() == teamColor) {
+                    if (piece.getPieceType() == ChessPiece.PieceType.KING && piece.getTeamColor() == teamColor) {
                         return pos;
                     }
                 }
@@ -96,14 +96,17 @@ public class ChessGame {
                 ChessPosition pos = new ChessPosition(row, col);
                 ChessPiece piece = getBoard().getPiece(pos);
 
-                if (piece != null) {
-                    if (piece.getTeamColor() != teamColor) {
-                        Collection<ChessMove> move_lst = piece.pieceMoves(getBoard(), pos);
-                        for(ChessMove move : move_lst) {
-                            if(move.getEndPosition() == king_pos) {
-                                return true;
-                            }
-                        }
+                if (piece == null) {
+                    continue;
+                }
+                if (piece.getTeamColor() == teamColor) {
+                    continue;
+                }
+
+                Collection<ChessMove> move_lst = piece.pieceMoves(getBoard(), pos);
+                for(ChessMove move : move_lst) {
+                    if(move.getEndPosition().equals(king_pos)) {
+                        return true;
                     }
                 }
             }
