@@ -14,7 +14,7 @@ public class ChessGame {
     private ChessBoard board = new ChessBoard();
 
     public ChessGame() {
-
+        board.resetBoard();
     }
 
     /**
@@ -155,5 +155,18 @@ public class ChessGame {
      */
     public ChessBoard getBoard() {
         return board;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        ChessGame chessGame = (ChessGame) o;
+        return turn == chessGame.turn && Objects.equals(board, chessGame.board);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(turn, board);
     }
 }
