@@ -49,12 +49,8 @@ public class ChessGame {
      * startPosition
      */
     public Collection<ChessMove> validMoves(ChessPosition startPosition) {
-       ChessPiece piece = getBoard().getPiece(startPosition);
-       if(piece != null) {
-           return piece.pieceMoves(getBoard(), startPosition);
-       } else {
-           return null;
-       }
+        ChessBoard temp_board = new ChessBoard(getBoard());
+
     }
 
     /**
