@@ -1,7 +1,10 @@
 package service;
 
-import dataaccess.UserDataAccess;
 
 public class UserServices {
-    private final UserDataAccess UserDataAccess;
+    public static String registerUser() {
+        return """
+                { "username":"", "password":"", "email":"" }
+                """;
+    }
 }
