@@ -9,9 +9,9 @@ public class MemoryUserDAO implements UserDataAccess {
     HashMap<String, UserData> userStorage = new HashMap<>();
 
     @Override
-    public UserData createUser(UserData newUser) throws DataAccessException {
+    public String createUser(UserData newUser) throws DataAccessException {
         userStorage.put(newUser.username(), newUser);
-        return newUser;
+        return "200";
     }
 
     @Override

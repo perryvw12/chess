@@ -1,12 +1,16 @@
 package server;
 
 import com.google.gson.Gson;
+import dataaccess.AuthDataAccess;
 import dataaccess.DataAccessException;
+import dataaccess.MemoryUserDAO;
+import dataaccess.UserDataAccess;
 import model.UserData;
 import service.UserServices;
 import spark.*;
 
 public class Server {
+    UserDataAccess userDataAccess = new MemoryUserDAO();
 
     public int run(int desiredPort) {
         Spark.port(desiredPort);
