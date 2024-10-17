@@ -6,6 +6,8 @@ import model.UserData;
 import service.UserServices;
 import spark.*;
 
+import java.util.HashMap;
+
 public class Server {
     UserDataAccess userDataAccess = new MemoryUserDAO();
     AuthDataAccess authDataAccess = new MemoryAuthDAO();
@@ -35,9 +37,17 @@ public class Server {
     private Object registerUser(Request req, Response res) throws DataAccessException {
         var newUser = new Gson().fromJson(req.body(), UserData.class);
         var user = userServices.registerUser(newUser);
+        if(user == "400") {
+            res.status(400);
+            HashMap<String, String> responseMap = new HashMap<>();
+            responseMap.put("message", "Error: bad request");
+            return new Gson().toJson(responseMap);
+        }
         if(user == "403") {
             res.status(403);
-            return new Gson().toJson("Error: already taken" );
+            HashMap<String, String> responseMap = new HashMap<>();
+            responseMap.put("message", "Error: already taken");
+            return new Gson().toJson(responseMap);
         }
         res.status(200);
         return new Gson().toJson(user);
