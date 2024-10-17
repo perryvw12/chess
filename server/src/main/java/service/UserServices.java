@@ -16,7 +16,7 @@ public class UserServices {
     }
 
     public Object registerUser(UserData newUser) throws DataAccessException {
-        if(Objects.equals(newUser.username(), "") | Objects.equals(newUser.password(), "") | Objects.equals(newUser.email(), "")) {
+        if(Objects.equals(newUser.username(), null) | Objects.equals(newUser.password(), null) | Objects.equals(newUser.email(), null)) {
             return "400";
         }
         if(dataAccess.userDataAccess.getUser(newUser.username()) != null) {

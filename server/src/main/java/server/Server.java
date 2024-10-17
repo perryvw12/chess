@@ -55,6 +55,6 @@ public class Server {
     private Object deleteAll(Request req, Response res) throws DataAccessException {
         userServices.deleteAll();
         res.status(200);
-        return new Gson().toJson("");
+        return "";
     }
 }
