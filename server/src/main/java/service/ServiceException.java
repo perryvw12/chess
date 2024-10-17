@@ -11,4 +11,5 @@ public class ServiceException extends Exception {
     public int getStatusCode() {
         return statusCode;
     }
+
 }

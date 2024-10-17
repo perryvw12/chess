@@ -3,6 +3,7 @@ package server;
 import com.google.gson.Gson;
 import dataaccess.*;
 import model.UserData;
+import service.ServiceException;
 import service.UserServices;
 import spark.*;
 
@@ -20,6 +21,7 @@ public class Server {
         // Register your endpoints and handle exceptions here.
         Spark.post("/user", this::registerUser);
         Spark.delete("/db", this::deleteAll);
+        Spark.exception(ServiceException.class, this::exceptionHandler);
 
         Spark.awaitInitialization();
         return Spark.port();
@@ -30,23 +32,22 @@ public class Server {
         Spark.awaitStop();
     }
 
-    private Object registerUser(Request req, Response res) throws DataAccessException {
-        var newUser = new Gson().fromJson(req.body(), UserData.class);
-        var user = userServices.registerUser(newUser);
-        if(user == "400") {
-            res.status(400);
-            HashMap<String, String> responseMap = new HashMap<>();
-            responseMap.put("message", "Error: bad request");
-            return new Gson().toJson(responseMap);
+    private void exceptionHandler(ServiceException ex, Request req, Response res) {
+        res.status(ex.getStatusCode());
+    }
+
+    private Object registerUser(Request req, Response res) throws DataAccessException, ServiceException {
+        try {
+            var newUser = new Gson().fromJson(req.body(), UserData.class);
+            var user = userServices.registerUser(newUser);
+            res.status(200);
+            return new Gson().toJson(user);
+        } catch (ServiceException ex) {
+            HashMap<String, String> errorMap = new HashMap<>();
+            errorMap.put("message", ex.getMessage());
+            res.status(ex.getStatusCode());
+            return new Gson().toJson(errorMap);
         }
-        if(user == "403") {
-            res.status(403);
-            HashMap<String, String> responseMap = new HashMap<>();
-            responseMap.put("message", "Error: already taken");
-            return new Gson().toJson(responseMap);
-        }
-        res.status(200);
-        return new Gson().toJson(user);
     }
 
     private Object deleteAll(Request req, Response res) throws DataAccessException {

@@ -15,12 +15,12 @@ public class UserServices {
         this.dataAccess = dataAccess;
     }
 
-    public Object registerUser(UserData newUser) throws DataAccessException {
+    public Object registerUser(UserData newUser) throws DataAccessException, ServiceException {
         if(Objects.equals(newUser.username(), null) | Objects.equals(newUser.password(), null) | Objects.equals(newUser.email(), null)) {
-            return "400";
+            throw new ServiceException(400, "Error: bad request");
         }
         if(dataAccess.userDataAccess.getUser(newUser.username()) != null) {
-            return "403";
+            throw new ServiceException(403, "Error: already taken");
         } else {
             dataAccess.userDataAccess.createUser(newUser);
             return dataAccess.authDataAccess.createAuth(newUser.username());
