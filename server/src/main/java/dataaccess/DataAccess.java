@@ -1,15 +1,17 @@
 package dataaccess;
 
-import org.eclipse.jetty.server.Authentication;
-
 public class DataAccess {
     public UserDataAccess userDataAccess;
     public AuthDataAccess authDataAccess;
     public GameDataAccess gameDataAccess;
 
-    public DataAccess(UserDataAccess userDataAccess, AuthDataAccess authDataAccess, GameDataAccess gameDataAccess) {
-        this.userDataAccess = userDataAccess;
-        this.authDataAccess = authDataAccess;
-        this.gameDataAccess = gameDataAccess;
+    public DataAccess(Implementation implementation) {
+        if (implementation == Implementation.MEMORY) {
+            userDataAccess = new MemoryUserDAO();
+            authDataAccess = new MemoryAuthDAO();
+            gameDataAccess = new MemoryGameDAO();
+        }
     }
+
+    public enum Implementation {MEMORY, SQL}
 }

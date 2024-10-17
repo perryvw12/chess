@@ -9,10 +9,7 @@ import spark.*;
 import java.util.HashMap;
 
 public class Server {
-    UserDataAccess userDataAccess = new MemoryUserDAO();
-    AuthDataAccess authDataAccess = new MemoryAuthDAO();
-    GameDataAccess gameDataAccess = new MemoryGameDAO();
-    DataAccess dataAccess = new DataAccess(userDataAccess, authDataAccess, gameDataAccess);
+    DataAccess dataAccess = new DataAccess(DataAccess.Implementation.MEMORY);
     UserServices userServices = new UserServices(dataAccess);
 
     public int run(int desiredPort) {
