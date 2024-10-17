@@ -1,16 +1,17 @@
 package server;
 
 import com.google.gson.Gson;
-import dataaccess.AuthDataAccess;
-import dataaccess.DataAccessException;
-import dataaccess.MemoryUserDAO;
-import dataaccess.UserDataAccess;
+import dataaccess.*;
 import model.UserData;
 import service.UserServices;
 import spark.*;
 
 public class Server {
     UserDataAccess userDataAccess = new MemoryUserDAO();
+    AuthDataAccess authDataAccess = new MemoryAuthDAO();
+    GameDataAccess gameDataAccess = new MemoryGameDAO();
+    DataAccess dataAccess = new DataAccess(userDataAccess, authDataAccess, gameDataAccess);
+    UserServices userServices = new UserServices(dataAccess);
 
     public int run(int desiredPort) {
         Spark.port(desiredPort);
@@ -33,7 +34,7 @@ public class Server {
 
     private Object registerUser(Request req, Response res) throws DataAccessException {
         var newUser = new Gson().fromJson(req.body(), UserData.class);
-        var user = UserServices.registerUser(newUser);
+        var user = userServices.registerUser(newUser);
         return new Gson().toJson(user);
     }
 }

@@ -3,7 +3,7 @@ package dataaccess;
 import model.AuthData;
 
 public interface AuthDataAccess {
-    String createAuth(AuthData authData) throws DataAccessException;
+    AuthData createAuth(String username) throws DataAccessException;
 
     String deleteAuth(String authToken) throws DataAccessException;
 

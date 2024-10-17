@@ -1,20 +1,24 @@
 package service;
 
 
+import dataaccess.DataAccess;
 import dataaccess.DataAccessException;
-import dataaccess.MemoryUserDAO;
+import model.AuthData;
 import model.UserData;
-import dataaccess.UserDataAccess;
 
 public class UserServices {
-    static UserDataAccess userDataAccess = new MemoryUserDAO();
+    DataAccess dataAccess;
 
-    public static String registerUser(UserData newUser) throws DataAccessException {
-        if(userDataAccess.getUser(newUser.username()) == null) {
+    public UserServices(DataAccess dataAccess) {
+        this.dataAccess = dataAccess;
+    }
+
+    public Object registerUser(UserData newUser) throws DataAccessException {
+        if(dataAccess.userDataAccess.getUser(newUser.username()) == null) {
             return "403";
         } else {
-            userDataAccess.createUser(newUser);
-            return "200";
+            dataAccess.userDataAccess.createUser(newUser);
+            return dataAccess.authDataAccess.createAuth(newUser.username());
         }
 
     }
