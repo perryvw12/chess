@@ -14,7 +14,7 @@ public class UserServices {
     }
 
     public Object registerUser(UserData newUser) throws DataAccessException {
-        if(dataAccess.userDataAccess.getUser(newUser.username()) == null) {
+        if(dataAccess.userDataAccess.getUser(newUser.username()) != null) {
             return "403";
         } else {
             dataAccess.userDataAccess.createUser(newUser);
