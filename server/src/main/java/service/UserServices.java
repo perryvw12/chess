@@ -25,6 +25,9 @@ public class UserServices {
             dataAccess.userDataAccess.createUser(newUser);
             return dataAccess.authDataAccess.createAuth(newUser.username());
         }
+    }
 
+    public void deleteAll() throws DataAccessException {
+        dataAccess.userDataAccess.deleteUsers();
     }
 }
