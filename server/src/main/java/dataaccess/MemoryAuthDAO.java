@@ -5,14 +5,14 @@ import model.AuthData;
 import java.util.HashMap;
 
 public class MemoryAuthDAO implements AuthDataAccess {
-    HashMap<String, AuthData> AuthStorage = new HashMap<>();
+    HashMap<String, AuthData> authStorage = new HashMap<>();
     int tokenCount = 0;
 
     @Override
     public AuthData createAuth(String username) throws DataAccessException {
         tokenCount += 1;
         AuthData newAuth = new AuthData(Integer.toString(tokenCount), username);
-        AuthStorage.put(Integer.toString(tokenCount), newAuth);
+        authStorage.put(Integer.toString(tokenCount), newAuth);
         return newAuth;
     }
 
@@ -24,5 +24,10 @@ public class MemoryAuthDAO implements AuthDataAccess {
     @Override
     public AuthData getAuth(String authToken) throws DataAccessException {
         return null;
+    }
+
+    @Override
+    public void clearAuth() throws DataAccessException {
+        authStorage = new HashMap<>();
     }
 }

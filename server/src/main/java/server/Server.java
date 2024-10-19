@@ -3,15 +3,17 @@ package server;
 import com.google.gson.Gson;
 import dataaccess.*;
 import model.UserData;
+import service.ClearService;
 import service.ServiceException;
-import service.UserServices;
+import service.RegistrationService;
 import spark.*;
 
 import java.util.HashMap;
 
 public class Server {
     DataAccess dataAccess = new DataAccess(DataAccess.Implementation.MEMORY);
-    UserServices userServices = new UserServices(dataAccess);
+    RegistrationService registrationService = new RegistrationService(dataAccess);
+    ClearService clearService = new ClearService(dataAccess);
 
     public int run(int desiredPort) {
         Spark.port(desiredPort);
@@ -39,7 +41,7 @@ public class Server {
     private Object registerUser(Request req, Response res) throws DataAccessException, ServiceException {
         try {
             var newUser = new Gson().fromJson(req.body(), UserData.class);
-            var user = userServices.registerUser(newUser);
+            var user = registrationService.registerUser(newUser);
             res.status(200);
             return new Gson().toJson(user);
         } catch (ServiceException ex) {
@@ -51,7 +53,7 @@ public class Server {
     }
 
     private Object deleteAll(Request req, Response res) throws DataAccessException {
-        userServices.deleteAll();
+        clearService.deleteAll();
         res.status(200);
         return "";
     }

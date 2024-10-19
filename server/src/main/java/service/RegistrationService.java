@@ -3,15 +3,14 @@ package service;
 
 import dataaccess.DataAccess;
 import dataaccess.DataAccessException;
-import model.AuthData;
 import model.UserData;
 
 import java.util.Objects;
 
-public class UserServices {
+public class RegistrationService {
     DataAccess dataAccess;
 
-    public UserServices(DataAccess dataAccess) {
+    public RegistrationService(DataAccess dataAccess) {
         this.dataAccess = dataAccess;
     }
 
@@ -25,9 +24,5 @@ public class UserServices {
             dataAccess.userDataAccess.createUser(newUser);
             return dataAccess.authDataAccess.createAuth(newUser.username());
         }
-    }
-
-    public void deleteAll() throws DataAccessException {
-        dataAccess.userDataAccess.deleteUsers();
     }
 }

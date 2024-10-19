@@ -11,4 +11,6 @@ public interface GameDataAccess {
     ArrayList<GameData> listGames() throws DataAccessException;
 
     boolean updateGame(String gameID, ChessGame game) throws DataAccessException;
+
+    void deleteGames() throws DataAccessException;
 }
