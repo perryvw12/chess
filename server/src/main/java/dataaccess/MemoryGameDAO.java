@@ -31,7 +31,7 @@ public class MemoryGameDAO implements GameDataAccess{
     }
 
     @Override
-    public void deleteGames() throws DataAccessException {
+    public void clearGames() throws DataAccessException {
         gameStorage = new HashMap<>();
     }
 }

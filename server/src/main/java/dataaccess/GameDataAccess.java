@@ -12,5 +12,5 @@ public interface GameDataAccess {
 
     boolean updateGame(String gameID, ChessGame game) throws DataAccessException;
 
-    void deleteGames() throws DataAccessException;
+    void clearGames() throws DataAccessException;
 }

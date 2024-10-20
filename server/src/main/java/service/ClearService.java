@@ -3,9 +3,6 @@ package service;
 import dataaccess.DataAccess;
 import dataaccess.DataAccessException;
 
-
-import java.util.Objects;
-
 public class ClearService {
     DataAccess dataAccess;
 
@@ -14,8 +11,8 @@ public class ClearService {
     }
 
     public void deleteAll() throws DataAccessException {
-        dataAccess.userDataAccess.deleteUsers();
+        dataAccess.userDataAccess.clearUsers();
         dataAccess.authDataAccess.clearAuth();
-
+        dataAccess.gameDataAccess.clearGames();
     }
 }

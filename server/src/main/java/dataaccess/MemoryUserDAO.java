@@ -19,7 +19,7 @@ public class MemoryUserDAO implements UserDataAccess {
     }
 
     @Override
-    public void deleteUsers() throws DataAccessException {
+    public void clearUsers() throws DataAccessException {
         userStorage = new HashMap<>();
     }
 }
