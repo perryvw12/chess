@@ -17,13 +17,13 @@ public class MemoryAuthDAO implements AuthDataAccess {
     }
 
     @Override
-    public String deleteAuth(String authToken) throws DataAccessException {
-        return "";
+    public void deleteAuth(String authToken) throws DataAccessException {
+        authStorage.remove(authToken);
     }
 
     @Override
     public AuthData getAuth(String authToken) throws DataAccessException {
-        return null;
+        return authStorage.get(authToken);
     }
 
     @Override
