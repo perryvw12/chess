@@ -6,6 +6,7 @@ import model.GameData;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Map;
 import java.util.Random;
 
 public class MemoryGameDAO implements GameDataAccess{
@@ -29,7 +30,7 @@ public class MemoryGameDAO implements GameDataAccess{
 
     @Override
     public ArrayList<GameData> listGames() throws DataAccessException {
-        return null;
+        return new ArrayList<>(gameStorage.values());
     }
 
     @Override
