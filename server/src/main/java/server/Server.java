@@ -4,10 +4,7 @@ import com.google.gson.Gson;
 import dataaccess.*;
 import model.AuthData;
 import model.UserData;
-import service.ClearService;
-import service.LogoutService;
-import service.ServiceException;
-import service.RegistrationService;
+import service.*;
 import spark.*;
 
 import java.io.Reader;
@@ -18,6 +15,7 @@ public class Server {
     RegistrationService registrationService = new RegistrationService(dataAccess);
     ClearService clearService = new ClearService(dataAccess);
     LogoutService logoutService = new LogoutService(dataAccess);
+    LoginService loginService = new LoginService(dataAccess);
 
     public int run(int desiredPort) {
         Spark.port(desiredPort);
@@ -26,6 +24,7 @@ public class Server {
 
         // Register your endpoints and handle exceptions here.
         Spark.post("/user", this::registerUser);
+        Spark.post("/session", this::login);
         Spark.delete("/db", this::deleteAll);
         Spark.delete("/session", this::logout);
         Spark.exception(ServiceException.class, this::exceptionHandler);
@@ -49,6 +48,19 @@ public class Server {
             var user = registrationService.registerUser(newUser);
             res.status(200);
             return new Gson().toJson(user);
+        } catch (ServiceException ex) {
+            HashMap<String, String> errorMap = new HashMap<>();
+            errorMap.put("message", ex.getMessage());
+            res.status(ex.getStatusCode());
+            return new Gson().toJson(errorMap);
+        }
+    }
+
+    private Object login(Request req, Response res) throws DataAccessException {
+        try {
+            var loginReq = new Gson().fromJson(req.body(), UserData.class);
+            var authData = loginService.loginUser(loginReq.username(), loginReq.password());
+            return new Gson().toJson(authData);
         } catch (ServiceException ex) {
             HashMap<String, String> errorMap = new HashMap<>();
             errorMap.put("message", ex.getMessage());
