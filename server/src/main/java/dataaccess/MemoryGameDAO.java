@@ -6,13 +6,20 @@ import model.GameData;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Random;
 
 public class MemoryGameDAO implements GameDataAccess{
-    HashMap<String, AuthData> gameStorage = new HashMap<>();
+    HashMap<Integer, GameData> gameStorage = new HashMap<>();
+    Random IDGenerator = new Random();
 
     @Override
-    public String createGame(GameData gameData) throws DataAccessException {
-        return "";
+    public HashMap<String, Integer> createGame(String gameName) throws DataAccessException {
+        int gameID = IDGenerator.nextInt(1000);
+        GameData gameData = new GameData(gameID, "", "", gameName, new ChessGame());
+        gameStorage.put(gameID, gameData);
+        HashMap<String, Integer> createGameResult = new HashMap<>();
+        createGameResult.put("gameID", gameID);
+        return createGameResult;
     }
 
     @Override

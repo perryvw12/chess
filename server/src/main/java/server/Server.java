@@ -1,6 +1,8 @@
 package server;
 
 import com.google.gson.Gson;
+import com.google.gson.JsonObject;
+import com.google.gson.JsonParser;
 import dataaccess.*;
 import model.AuthData;
 import model.UserData;
@@ -16,6 +18,7 @@ public class Server {
     ClearService clearService = new ClearService(dataAccess);
     LogoutService logoutService = new LogoutService(dataAccess);
     LoginService loginService = new LoginService(dataAccess);
+    NewGameService newGameService = new NewGameService(dataAccess);
 
     public int run(int desiredPort) {
         Spark.port(desiredPort);
@@ -27,6 +30,7 @@ public class Server {
         Spark.post("/session", this::login);
         Spark.delete("/db", this::deleteAll);
         Spark.delete("/session", this::logout);
+        Spark.post("/game", this::createGame);
         Spark.exception(ServiceException.class, this::exceptionHandler);
 
         Spark.awaitInitialization();
@@ -80,6 +84,21 @@ public class Server {
             var authToken = req.headers("authorization");
             logoutService.logoutUser(authToken);
             return "";
+        } catch (ServiceException ex) {
+            HashMap<String, String> errorMap = new HashMap<>();
+            errorMap.put("message", ex.getMessage());
+            res.status(ex.getStatusCode());
+            return new Gson().toJson(errorMap);
+        }
+    }
+
+    private Object createGame(Request req, Response res) throws DataAccessException {
+        try {
+            var authToken = req.headers("authorization");
+            JsonObject jsonObject = JsonParser.parseString(req.body()).getAsJsonObject();
+            String gameName = jsonObject.get("gameName").getAsString();
+            HashMap<String, Integer> createGameResult = newGameService.createGame(authToken, gameName);
+            return new Gson().toJson(createGameResult);
         } catch (ServiceException ex) {
             HashMap<String, String> errorMap = new HashMap<>();
             errorMap.put("message", ex.getMessage());
