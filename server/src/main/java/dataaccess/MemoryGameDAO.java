@@ -16,7 +16,7 @@ public class MemoryGameDAO implements GameDataAccess{
     @Override
     public HashMap<String, Integer> createGame(String gameName) throws DataAccessException {
         int gameID = IDGenerator.nextInt(1000);
-        GameData gameData = new GameData(gameID, "", "", gameName, new ChessGame());
+        GameData gameData = new GameData(gameID, null, null, gameName, new ChessGame());
         gameStorage.put(gameID, gameData);
         HashMap<String, Integer> createGameResult = new HashMap<>();
         createGameResult.put("gameID", gameID);
@@ -24,8 +24,8 @@ public class MemoryGameDAO implements GameDataAccess{
     }
 
     @Override
-    public GameData getGame(String gameID) throws DataAccessException {
-        return null;
+    public GameData getGame(int gameID) throws DataAccessException {
+        return gameStorage.get(gameID);
     }
 
     @Override
@@ -34,8 +34,8 @@ public class MemoryGameDAO implements GameDataAccess{
     }
 
     @Override
-    public boolean updateGame(String gameID, ChessGame game) throws DataAccessException {
-        return false;
+    public void updateGame(int gameID, GameData updatedGame) throws DataAccessException {
+        gameStorage.put(gameID, updatedGame);
     }
 
     @Override

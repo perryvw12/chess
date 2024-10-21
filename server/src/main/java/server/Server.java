@@ -22,6 +22,7 @@ public class Server {
     LoginService loginService = new LoginService(dataAccess);
     NewGameService newGameService = new NewGameService(dataAccess);
     ListGameService listGameService = new ListGameService(dataAccess);
+    JoinGameService joinGameService = new JoinGameService(dataAccess);
 
     public int run(int desiredPort) {
         Spark.port(desiredPort);
@@ -35,6 +36,7 @@ public class Server {
         Spark.delete("/session", this::logout);
         Spark.post("/game", this::createGame);
         Spark.get("/game", this::listGame);
+        Spark.put("/game", this::joinGame);
         Spark.exception(ServiceException.class, this::exceptionHandler);
 
         Spark.awaitInitialization();
@@ -115,11 +117,28 @@ public class Server {
         try {
             var authToken = req.headers("authorization");
             ArrayList<GameData> gameList = listGameService.listGames(authToken);
-            if(gameList.isEmpty()) {
-                return "";
-            } else {
-                return new Gson().toJson(gameList);
+            HashMap<String, ArrayList<GameData>> games = new HashMap<>();
+            games.put("games", gameList);
+            return new Gson().toJson(games);
+        } catch (ServiceException ex) {
+            HashMap<String, String> errorMap = new HashMap<>();
+            errorMap.put("message", ex.getMessage());
+            res.status(ex.getStatusCode());
+            return new Gson().toJson(errorMap);
+        }
+    }
+
+    private Object joinGame(Request req, Response res) throws DataAccessException {
+        try {
+            var authToken = req.headers("authorization");
+            JsonObject jsonObject = JsonParser.parseString(req.body()).getAsJsonObject();
+            if(!jsonObject.has("gameID") | !jsonObject.has("playerColor")) {
+                throw new ServiceException(400, "Error: bad request");
             }
+            int gameID = jsonObject.get("gameID").getAsInt();
+            String playerColor = jsonObject.get("playerColor").getAsString();
+            joinGameService.joinGame(authToken, playerColor, gameID);
+            return "";
         } catch (ServiceException ex) {
             HashMap<String, String> errorMap = new HashMap<>();
             errorMap.put("message", ex.getMessage());

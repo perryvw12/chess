@@ -7,11 +7,11 @@ import java.util.HashMap;
 public interface GameDataAccess {
     HashMap<String, Integer> createGame(String gameName) throws DataAccessException;
 
-    GameData getGame(String gameID) throws DataAccessException;
+    GameData getGame(int gameID) throws DataAccessException;
 
     ArrayList<GameData> listGames() throws DataAccessException;
 
-    boolean updateGame(String gameID, ChessGame game) throws DataAccessException;
+    void updateGame(int gameID, GameData updatedGame) throws DataAccessException;
 
     void clearGames() throws DataAccessException;
 }
