@@ -5,11 +5,13 @@ import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import dataaccess.*;
 import model.AuthData;
+import model.GameData;
 import model.UserData;
 import service.*;
 import spark.*;
 
 import java.io.Reader;
+import java.util.ArrayList;
 import java.util.HashMap;
 
 public class Server {
@@ -19,6 +21,7 @@ public class Server {
     LogoutService logoutService = new LogoutService(dataAccess);
     LoginService loginService = new LoginService(dataAccess);
     NewGameService newGameService = new NewGameService(dataAccess);
+    ListGameService listGameService = new ListGameService(dataAccess);
 
     public int run(int desiredPort) {
         Spark.port(desiredPort);
@@ -31,6 +34,7 @@ public class Server {
         Spark.delete("/db", this::deleteAll);
         Spark.delete("/session", this::logout);
         Spark.post("/game", this::createGame);
+        Spark.get("/game", this::listGame);
         Spark.exception(ServiceException.class, this::exceptionHandler);
 
         Spark.awaitInitialization();
@@ -99,6 +103,23 @@ public class Server {
             String gameName = jsonObject.get("gameName").getAsString();
             HashMap<String, Integer> createGameResult = newGameService.createGame(authToken, gameName);
             return new Gson().toJson(createGameResult);
+        } catch (ServiceException ex) {
+            HashMap<String, String> errorMap = new HashMap<>();
+            errorMap.put("message", ex.getMessage());
+            res.status(ex.getStatusCode());
+            return new Gson().toJson(errorMap);
+        }
+    }
+
+    private Object listGame(Request req, Response res) throws DataAccessException {
+        try {
+            var authToken = req.headers("authorization");
+            ArrayList<GameData> gameList = listGameService.listGames(authToken);
+            if(gameList.isEmpty()) {
+                return "";
+            } else {
+                return new Gson().toJson(gameList);
+            }
         } catch (ServiceException ex) {
             HashMap<String, String> errorMap = new HashMap<>();
             errorMap.put("message", ex.getMessage());
