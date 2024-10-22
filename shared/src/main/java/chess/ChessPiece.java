@@ -53,7 +53,7 @@ public class ChessPiece {
     }
 
     //A helper function that adds specified moves to a collection of chess moves//
-    private void move_adder (ChessBoard board, ChessPosition myPosition, int row_move, int col_move, boolean repetitive, Collection<ChessMove> moves) {
+    private void moveAdder(ChessBoard board, ChessPosition myPosition, int row_move, int col_move, boolean repetitive, Collection<ChessMove> moves) {
         int row = myPosition.getRow();
         int col = myPosition.getColumn();
 
@@ -98,61 +98,61 @@ public class ChessPiece {
         }
     }
 
-    private void pawn_mover (ChessBoard board, ChessPosition myPosition, int direction,  Collection<ChessMove> moves) {
+    private void pawnMover(ChessBoard board, ChessPosition myPosition, int direction, Collection<ChessMove> moves) {
         int row = myPosition.getRow();
         int col = myPosition.getColumn();
-        int new_row = row + direction;
+        int newRow = row + direction;
 
-        ChessPosition new_pos = new ChessPosition(new_row, col);
-        ChessPiece piece_at_new_pos = board.getPiece(new_pos);
+        ChessPosition newPos = new ChessPosition(newRow, col);
+        ChessPiece pieceAtNewPos = board.getPiece(newPos);
 
-        if (piece_at_new_pos == null) {
+        if (pieceAtNewPos == null) {
             //move 1 space
-            if(new_row == 8 || new_row == 1) {
+            if(newRow == 8 || newRow == 1) {
                 for(PieceType pieces : PieceType.values()) {
                     if (pieces == PieceType.KING || pieces == PieceType.PAWN) {
                         continue;
                     } else {
-                        moves.add(new ChessMove(myPosition, new_pos, pieces));
+                        moves.add(new ChessMove(myPosition, newPos, pieces));
                     }
                 }
                 return;
             } else {
-                moves.add(new ChessMove(myPosition, new_pos, null));
+                moves.add(new ChessMove(myPosition, newPos, null));
             }
 
             //move 2 spaces
-            ChessPosition double_move = new ChessPosition((new_row + direction), col);
-            ChessPiece piece_at_double = board.getPiece(double_move);
+            ChessPosition doubleMove = new ChessPosition((newRow + direction), col);
+            ChessPiece pieceAtDouble = board.getPiece(doubleMove);
             if((direction == 1 & row == 2) || (direction == -1 & row == 7)) {
-                if (piece_at_double == null) {
-                    moves.add(new ChessMove(myPosition, double_move, null));
+                if (pieceAtDouble == null) {
+                    moves.add(new ChessMove(myPosition, doubleMove, null));
                 }
             }
         }
     }
 
-    private void pawn_attack (ChessBoard board, ChessPosition myPosition, int row_move, int col_move, Collection<ChessMove> moves) {
+    private void pawnAttack(ChessBoard board, ChessPosition myPosition, int row_move, int col_move, Collection<ChessMove> moves) {
         int row = myPosition.getRow();
         int col = myPosition.getColumn();
 
-        ChessPosition new_pos = new ChessPosition(row + row_move, col + col_move);
+        ChessPosition newPos = new ChessPosition(row + row_move, col + col_move);
 
-        if(new_pos.getColumn() >= 1 & new_pos.getColumn() <= 8) {
-            ChessPiece piece_at_pos = board.getPiece(new_pos);
+        if(newPos.getColumn() >= 1 & newPos.getColumn() <= 8) {
+            ChessPiece pieceAtPos = board.getPiece(newPos);
 
-            if(piece_at_pos != null) {
-                if(piece_at_pos.getTeamColor() != pieceColor) {
-                    if(new_pos.getRow() == 8 || new_pos.getRow() == 1) {
+            if(pieceAtPos != null) {
+                if(pieceAtPos.getTeamColor() != pieceColor) {
+                    if(newPos.getRow() == 8 || newPos.getRow() == 1) {
                         for (PieceType pieces : PieceType.values()) {
                             if (pieces == PieceType.KING || pieces == PieceType.PAWN) {
                                 continue;
                             } else {
-                                moves.add(new ChessMove(myPosition, new_pos, pieces));
+                                moves.add(new ChessMove(myPosition, newPos, pieces));
                             }
                         }
                     } else {
-                        moves.add(new ChessMove(myPosition, new_pos, null));
+                        moves.add(new ChessMove(myPosition, newPos, null));
                     }
                 }
             }
@@ -172,92 +172,92 @@ public class ChessPiece {
         switch (type) {
             case PieceType.BISHOP: {
                 //move up right
-                move_adder(board, myPosition, 1, 1, true, moves);
+                moveAdder(board, myPosition, 1, 1, true, moves);
                 //move up left
-                move_adder(board, myPosition, 1, -1, true, moves);
+                moveAdder(board, myPosition, 1, -1, true, moves);
                 //move down right
-                move_adder(board, myPosition, -1, 1, true, moves);
+                moveAdder(board, myPosition, -1, 1, true, moves);
                 //move down left
-                move_adder(board, myPosition, -1, -1, true, moves);
+                moveAdder(board, myPosition, -1, -1, true, moves);
                 break;
             }
 
             case PieceType.KING: {
                 //move right
-                move_adder(board, myPosition, 0, 1, false, moves);
+                moveAdder(board, myPosition, 0, 1, false, moves);
                 //move left
-                move_adder(board, myPosition, 0, -1, false, moves);
+                moveAdder(board, myPosition, 0, -1, false, moves);
                 //move up
-                move_adder(board, myPosition, 1, 0, false, moves);
+                moveAdder(board, myPosition, 1, 0, false, moves);
                 //move down
-                move_adder(board, myPosition, -1, 0, false, moves);
+                moveAdder(board, myPosition, -1, 0, false, moves);
                 //move up right
-                move_adder(board, myPosition, 1, 1, false, moves);
+                moveAdder(board, myPosition, 1, 1, false, moves);
                 //move up left
-                move_adder(board, myPosition, 1, -1, false, moves);
+                moveAdder(board, myPosition, 1, -1, false, moves);
                 //move down right
-                move_adder(board, myPosition, -1, 1, false, moves);
+                moveAdder(board, myPosition, -1, 1, false, moves);
                 //move down left
-                move_adder(board, myPosition, -1, -1, false, moves);
+                moveAdder(board, myPosition, -1, -1, false, moves);
                 break;
             }
             case PieceType.KNIGHT: {
-                move_adder(board, myPosition, 2, -1, false, moves);
-                move_adder(board, myPosition, 2, 1, false, moves);
-                move_adder(board, myPosition, -2, -1, false, moves);
-                move_adder(board, myPosition, -2, 1, false, moves);
-                move_adder(board, myPosition, -1, 2, false, moves);
-                move_adder(board, myPosition, 1, 2, false, moves);
-                move_adder(board, myPosition, -1, -2, false, moves);
-                move_adder(board, myPosition, 1, -2, false, moves);
+                moveAdder(board, myPosition, 2, -1, false, moves);
+                moveAdder(board, myPosition, 2, 1, false, moves);
+                moveAdder(board, myPosition, -2, -1, false, moves);
+                moveAdder(board, myPosition, -2, 1, false, moves);
+                moveAdder(board, myPosition, -1, 2, false, moves);
+                moveAdder(board, myPosition, 1, 2, false, moves);
+                moveAdder(board, myPosition, -1, -2, false, moves);
+                moveAdder(board, myPosition, 1, -2, false, moves);
                 break;
             }
 
             case PieceType.PAWN: {
                 //moves for white pawn
                 if (pieceColor == ChessGame.TeamColor.WHITE) {
-                    pawn_mover(board, myPosition, 1,  moves);
-                    pawn_attack(board, myPosition, 1, 1, moves);
-                    pawn_attack(board, myPosition, 1, -1, moves);
+                    pawnMover(board, myPosition, 1,  moves);
+                    pawnAttack(board, myPosition, 1, 1, moves);
+                    pawnAttack(board, myPosition, 1, -1, moves);
                 }
 
                 //moves for black pawn
                 if (pieceColor == ChessGame.TeamColor.BLACK) {
-                    pawn_mover(board, myPosition, -1,  moves);
-                    pawn_attack(board, myPosition, -1, 1, moves);
-                    pawn_attack(board, myPosition, -1, -1, moves);
+                    pawnMover(board, myPosition, -1,  moves);
+                    pawnAttack(board, myPosition, -1, 1, moves);
+                    pawnAttack(board, myPosition, -1, -1, moves);
                 }
                 break;
             }
             case PieceType.QUEEN: {
                 //move right
-                move_adder(board, myPosition, 0, 1, true, moves);
+                moveAdder(board, myPosition, 0, 1, true, moves);
                 //move left
-                move_adder(board, myPosition, 0, -1, true, moves);
+                moveAdder(board, myPosition, 0, -1, true, moves);
                 //move up
-                move_adder(board, myPosition, 1, 0, true, moves);
+                moveAdder(board, myPosition, 1, 0, true, moves);
                 //move down
-                move_adder(board, myPosition, -1, 0, true, moves);
+                moveAdder(board, myPosition, -1, 0, true, moves);
                 //move up right
-                move_adder(board, myPosition, 1, 1, true, moves);
+                moveAdder(board, myPosition, 1, 1, true, moves);
                 //move up left
-                move_adder(board, myPosition, 1, -1, true, moves);
+                moveAdder(board, myPosition, 1, -1, true, moves);
                 //move down right
-                move_adder(board, myPosition, -1, 1, true, moves);
+                moveAdder(board, myPosition, -1, 1, true, moves);
                 //move down left
-                move_adder(board, myPosition, -1, -1, true, moves);
+                moveAdder(board, myPosition, -1, -1, true, moves);
                 break;
             }
 
             case PieceType.ROOK: {
                 //move right
-                move_adder(board, myPosition, 0, 1, true, moves);
+                moveAdder(board, myPosition, 0, 1, true, moves);
                 //move left
-                move_adder(board, myPosition, 0, -1, true, moves);
+                moveAdder(board, myPosition, 0, -1, true, moves);
                 //move up
-                move_adder(board, myPosition, 1, 0, true, moves);
+                moveAdder(board, myPosition, 1, 0, true, moves);
                 //move down
-                move_adder(board, myPosition, -1, 0, true, moves);
+                moveAdder(board, myPosition, -1, 0, true, moves);
                 break;
             }
         }
