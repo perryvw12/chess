@@ -79,7 +79,7 @@ public class ValidMovesTests {
 
         ChessPosition position = new ChessPosition(4, 4);
         Assertions.assertTrue(game.validMoves(position).isEmpty(),
-                "ChessGame validMoves returned valid moves for a trapped piece");
+                "chessGame validMoves returned valid moves for a trapped piece");
     }
 
 
@@ -114,15 +114,15 @@ public class ValidMovesTests {
 
         //make sure teams other pieces are not allowed to move
         Assertions.assertTrue(game.validMoves(pawnPosition).isEmpty(),
-                "ChessGame validMoves returned valid moves for a trapped piece");
+                "chessGame validMoves returned valid moves for a trapped piece");
         Assertions.assertTrue(game.validMoves(bishopPosition).isEmpty(),
-                "ChessGame validMoves returned valid moves for a trapped piece");
+                "chessGame validMoves returned valid moves for a trapped piece");
         Assertions.assertTrue(game.validMoves(queenPosition).isEmpty(),
-                "ChessGame validMoves returned valid moves for a trapped piece");
+                "chessGame validMoves returned valid moves for a trapped piece");
         Assertions.assertTrue(game.validMoves(knightPosition).isEmpty(),
-                "ChessGame validMoves returned valid moves for a trapped piece");
+                "chessGame validMoves returned valid moves for a trapped piece");
         Assertions.assertTrue(game.validMoves(rookPosition).isEmpty(),
-                "ChessGame validMoves returned valid moves for a trapped piece");
+                "chessGame validMoves returned valid moves for a trapped piece");
     }
 
 

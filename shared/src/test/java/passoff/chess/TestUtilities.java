@@ -75,6 +75,6 @@ public class TestUtilities {
         var actualMoves = new HashSet<>(generatedMoves);
         Assertions.assertEquals(generatedMoves.size(), actualMoves.size(), "Duplicate move");
         Assertions.assertEquals(validMoves, actualMoves,
-                "ChessGame validMoves did not return the correct moves");
+                "chessGame validMoves did not return the correct moves");
     }
 }
