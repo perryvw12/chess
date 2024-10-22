@@ -9,11 +9,11 @@ import java.util.Random;
 
 public class MemoryGameDAO implements GameDataAccess{
     HashMap<Integer, GameData> gameStorage = new HashMap<>();
-    Random IdGenerator = new Random();
+    Random idGenerator = new Random();
 
     @Override
     public HashMap<String, Integer> createGame(String gameName) throws DataAccessException {
-        int gameID = IdGenerator.nextInt(1000);
+        int gameID = idGenerator.nextInt(1000);
         GameData gameData = new GameData(gameID, null, null, gameName, new ChessGame());
         gameStorage.put(gameID, gameData);
         HashMap<String, Integer> createGameResult = new HashMap<>();
