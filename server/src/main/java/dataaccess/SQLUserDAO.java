@@ -1,5 +1,6 @@
 package dataaccess;
 
+import com.google.gson.Gson;
 import model.UserData;
 import org.mindrot.jbcrypt.BCrypt;
 import service.ServiceException;
@@ -17,7 +18,20 @@ public class SQLUserDAO implements  UserDataAccess{
     }
 
     @Override
-    public UserData getUser(String username) throws DataAccessException {
+    public UserData getUser(String username) throws DataAccessException, ServiceException {
+        try (var conn = DatabaseManager.getConnection()) {
+            var statement = "SELECT username, json FROM userData WHERE username=?";
+            try (var ps = conn.prepareStatement(statement)) {
+                ps.setString(1, username);
+                try (var rs = ps.executeQuery()) {
+                    if (rs.next()) {
+                        return new Gson().fromJson(rs.getString("json"), UserData.class);
+                    }
+                }
+            }
+        } catch (Exception e) {
+            throw new ServiceException(500, "Unable to read data");
+        }
         return null;
     }
 
