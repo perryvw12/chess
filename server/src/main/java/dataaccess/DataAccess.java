@@ -1,5 +1,16 @@
 package dataaccess;
 
+import chess.ChessGame;
+import com.google.gson.Gson;
+import com.google.gson.JsonObject;
+import com.google.gson.JsonParser;
+import service.ServiceException;
+
+import java.sql.SQLException;
+import java.sql.Statement;
+
+import static java.sql.Types.NULL;
+
 public class DataAccess {
     public UserDataAccess userDataAccess;
     public AuthDataAccess authDataAccess;
@@ -11,7 +22,78 @@ public class DataAccess {
             authDataAccess = new MemoryAuthDAO();
             gameDataAccess = new MemoryGameDAO();
         } else if (implementation == Implementation.SQL) {
+            userDataAccess = new SQLUserDAO();
+            authDataAccess = new SQLAuthDAO();
+            gameDataAccess = new SQLGameDAO();
+        }
+    }
 
+    private final String[] createStatements = {
+            """
+            CREATE TABLE IF NOT EXISTS authData (
+            `authToken` int NOT NULL AUTO_INCREMENT,
+            `username` varchar(256) NOT NULL,
+            PRIMARY KEY (`authToken`)
+            INDEX(authToken)
+            ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci
+            """,
+            """
+            CREATE TABLE IF NOT EXISTS gameData (
+            `gameID` int NOT NULL AUTO_INCREMENT,
+            `whiteUsername` varchar(256) DEFAULT NULL,
+            `blackUsername` varchar(256) DEFAULT NULL,
+            `gameName` varchar(256) NOT NULL,
+            `chessGame` TEXT NOT NULL
+            PRIMARY KEY (`gameID`)
+            INDEX(gameID)
+            ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci
+            """,
+            """
+            CREATE TABLE IF NOT EXISTS userData (
+            `username` varchar(256) NOT NULL,
+            `password` varchar(256) NOT NULL,
+            `email` varchar(256) NOT NULL,
+            PRIMARY KEY (`username`)
+            INDEX(username)
+            ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci
+            """
+    };
+
+    private int executeUpdate(String statement, Object... params) throws DataAccessException, SQLException, ServiceException {
+        try(var conn = DatabaseManager.getConnection()) {
+            try (var ps = conn.prepareStatement(statement, Statement.RETURN_GENERATED_KEYS)) {
+                for (var i = 0; i < params.length; i++) {
+                    var param = params[i];
+                    switch (param) {
+                        case String p -> ps.setString(i + 1, p);
+                        case Integer p -> ps.setInt(i + 1, p);
+                        case ChessGame p -> ps.setString(i + 1, new Gson().toJson(p));
+                        case null -> ps.setNull(i + 1, NULL);
+                        default -> {
+                        }
+                    }
+                }
+                ps.executeUpdate();
+
+                var rs = ps.getGeneratedKeys();
+                if (rs.next()) {
+                    return rs.getInt(1);
+                }
+                return 0;
+            }
+        } catch (SQLException e) {
+            throw new ServiceException(500, "unable to update database");
+        }
+    }
+
+    private void configureDatabase() throws DataAccessException {
+        DatabaseManager.createDatabase();
+        try (var conn = DatabaseManager.getConnection()) {
+            for (var statement : createStatements) {
+                try (var preparedStatement = conn.prepareStatement(statement)) {
+                    preparedStatement.
+                }
+            }
         }
     }
 
