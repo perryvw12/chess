@@ -10,6 +10,8 @@ public class DataAccess {
             userDataAccess = new MemoryUserDAO();
             authDataAccess = new MemoryAuthDAO();
             gameDataAccess = new MemoryGameDAO();
+        } else if (implementation == Implementation.SQL) {
+
         }
     }
 
