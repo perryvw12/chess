@@ -2,8 +2,6 @@ package dataaccess;
 
 import chess.ChessGame;
 import com.google.gson.Gson;
-import com.google.gson.JsonObject;
-import com.google.gson.JsonParser;
 import service.ServiceException;
 
 import java.sql.SQLException;
@@ -86,14 +84,16 @@ public class DataAccess {
         }
     }
 
-    private void configureDatabase() throws DataAccessException {
+    private void configureDatabase() throws DataAccessException, ServiceException {
         DatabaseManager.createDatabase();
         try (var conn = DatabaseManager.getConnection()) {
             for (var statement : createStatements) {
                 try (var preparedStatement = conn.prepareStatement(statement)) {
-                    preparedStatement.
+                    preparedStatement.executeUpdate();
                 }
             }
+        } catch (SQLException ex) {
+            throw new ServiceException(500, "Unable to configure database");
         }
     }
 
