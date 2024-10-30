@@ -3,10 +3,8 @@ package dataaccess;
 import chess.ChessGame;
 import com.google.gson.Gson;
 import service.ServiceException;
-
 import java.sql.SQLException;
 import java.sql.Statement;
-
 import static java.sql.Types.NULL;
 
 public class DataAccess {
@@ -14,7 +12,7 @@ public class DataAccess {
     public AuthDataAccess authDataAccess;
     public GameDataAccess gameDataAccess;
 
-    public DataAccess(Implementation implementation) {
+    public DataAccess(Implementation implementation) throws ServiceException, DataAccessException {
         if (implementation == Implementation.MEMORY) {
             userDataAccess = new MemoryUserDAO();
             authDataAccess = new MemoryAuthDAO();
@@ -23,6 +21,7 @@ public class DataAccess {
             userDataAccess = new SQLUserDAO();
             authDataAccess = new SQLAuthDAO();
             gameDataAccess = new SQLGameDAO();
+            configureDatabase();
         }
     }
 
@@ -57,7 +56,7 @@ public class DataAccess {
             """
     };
 
-    private int executeUpdate(String statement, Object... params) throws DataAccessException, SQLException, ServiceException {
+    static int executeUpdate(String statement, Object... params) throws DataAccessException, SQLException, ServiceException {
         try(var conn = DatabaseManager.getConnection()) {
             try (var ps = conn.prepareStatement(statement, Statement.RETURN_GENERATED_KEYS)) {
                 for (var i = 0; i < params.length; i++) {
