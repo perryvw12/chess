@@ -29,7 +29,7 @@ public class DataAccess {
             """
             CREATE TABLE IF NOT EXISTS authData (
             `authToken` int NOT NULL AUTO_INCREMENT,
-            `username` varchar(256) NOT NULL,
+            `json` TEXT DEFAULT NULL,
             PRIMARY KEY (`authToken`)
             INDEX(authToken)
             ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci
@@ -37,10 +37,7 @@ public class DataAccess {
             """
             CREATE TABLE IF NOT EXISTS gameData (
             `gameID` int NOT NULL AUTO_INCREMENT,
-            `whiteUsername` varchar(256) DEFAULT NULL,
-            `blackUsername` varchar(256) DEFAULT NULL,
-            `gameName` varchar(256) NOT NULL,
-            `chessGame` TEXT NOT NULL
+            `json` TEXT NOT NULL
             PRIMARY KEY (`gameID`)
             INDEX(gameID)
             ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci
@@ -49,7 +46,7 @@ public class DataAccess {
             CREATE TABLE IF NOT EXISTS userData (
             `username` varchar(256) NOT NULL,
             `password` varchar(256) NOT NULL,
-            `email` varchar(256) NOT NULL,
+            `json` TEXT DEFAULT NULL,
             PRIMARY KEY (`username`)
             INDEX(username)
             ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci
