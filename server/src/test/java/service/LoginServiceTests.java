@@ -12,7 +12,7 @@ public class LoginServiceTests {
     static LoginService loginService = new LoginService(dataAccess);
 
     @BeforeAll
-    static void addUserTestData() throws DataAccessException {
+    static void addUserTestData() throws DataAccessException, ServiceException {
         var testUser = new UserData("testUser", "password", "g@mail");
         dataAccess.userDataAccess.createUser(testUser);
     }

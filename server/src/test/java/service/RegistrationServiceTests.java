@@ -12,7 +12,7 @@ public class RegistrationServiceTests {
     static RegistrationService registrationService = new RegistrationService(dataAccess);
 
     @BeforeEach
-    void clearUserData() throws DataAccessException {
+    void clearUserData() throws DataAccessException, ServiceException {
         dataAccess.userDataAccess.clearUsers();
     }
 

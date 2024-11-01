@@ -4,17 +4,14 @@ import com.google.gson.Gson;
 import model.UserData;
 import org.mindrot.jbcrypt.BCrypt;
 import service.ServiceException;
-
-import java.sql.SQLException;
-
 import static dataaccess.DataAccess.executeUpdate;
 
 public class SQLUserDAO implements  UserDataAccess{
     @Override
     public void createUser(UserData user) throws ServiceException {
         var hashedPass = BCrypt.hashpw(user.password(), BCrypt.gensalt());
-        var statement = "INSERT INTO userData (username, password, email) VALUES (?, ?, ?)";
-        executeUpdate(statement, user.username(), hashedPass, user.email());
+        var statement = "INSERT INTO userData (username, password, json) VALUES (?, ?, ?)";
+        executeUpdate(statement, user.username(), hashedPass, new Gson().toJson(user));
     }
 
     @Override
@@ -36,7 +33,8 @@ public class SQLUserDAO implements  UserDataAccess{
     }
 
     @Override
-    public void clearUsers() throws DataAccessException {
-
+    public void clearUsers() throws DataAccessException, ServiceException {
+        var statement = "TRUNCATE TABLE userData";
+        executeUpdate(statement);
     }
 }

@@ -11,7 +11,7 @@ public class ClearServiceTests {
     static ClearService clearService = new ClearService(dataAccess);
 
     @Test
-    void testClear() throws DataAccessException {
+    void testClear() throws DataAccessException, ServiceException {
         dataAccess.gameDataAccess.createGame("testGame");
         dataAccess.userDataAccess.createUser(new UserData("testUser", "password", "test@gmail.com"));
         var authData = dataAccess.authDataAccess.createAuth("testUser2");

@@ -10,7 +10,7 @@ public class ClearService {
         this.dataAccess = dataAccess;
     }
 
-    public void deleteAll() throws DataAccessException {
+    public void deleteAll() throws DataAccessException, ServiceException {
         dataAccess.userDataAccess.clearUsers();
         dataAccess.authDataAccess.clearAuth();
         dataAccess.gameDataAccess.clearGames();

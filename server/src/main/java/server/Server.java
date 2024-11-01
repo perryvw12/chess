@@ -17,7 +17,7 @@ import java.util.HashMap;
 import static dataaccess.DataAccess.configureDatabase;
 
 public class Server {
-    DataAccess dataAccess = new DataAccess(DataAccess.Implementation.MEMORY);
+    DataAccess dataAccess = new DataAccess(DataAccess.Implementation.SQL);
     RegistrationService registrationService = new RegistrationService(dataAccess);
     ClearService clearService = new ClearService(dataAccess);
     LogoutService logoutService = new LogoutService(dataAccess);
@@ -76,7 +76,7 @@ public class Server {
         }
     }
 
-    private Object deleteAll(Request req, Response res) throws DataAccessException {
+    private Object deleteAll(Request req, Response res) throws DataAccessException, ServiceException {
         clearService.deleteAll();
         res.status(200);
         return "";
