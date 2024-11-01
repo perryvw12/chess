@@ -13,7 +13,7 @@ public interface GameDataAccess {
 
     ArrayList<GameData> listGames() throws DataAccessException, ServiceException;
 
-    void updateGame(int gameID, GameData updatedGame) throws DataAccessException;
+    void updateGame(int gameID, GameData updatedGame) throws DataAccessException, ServiceException;
 
     void clearGames() throws DataAccessException, ServiceException;
 }
