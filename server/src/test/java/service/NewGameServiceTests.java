@@ -11,7 +11,7 @@ public class NewGameServiceTests {
     static NewGameService newGameService = new NewGameService(dataAccess);
 
     @BeforeEach
-    void clearTest() throws DataAccessException {
+    void clearTest() throws DataAccessException, ServiceException {
         dataAccess.gameDataAccess.clearGames();
     }
 

@@ -11,7 +11,7 @@ public class ListGameServiceTests {
     static ListGameService listGameService = new ListGameService(dataAccess);
 
     @BeforeEach
-    void addGames() throws DataAccessException {
+    void addGames() throws DataAccessException, ServiceException {
         dataAccess.gameDataAccess.clearGames();
         dataAccess.gameDataAccess.createGame("testGame2");
         dataAccess.gameDataAccess.createGame("testGame2");

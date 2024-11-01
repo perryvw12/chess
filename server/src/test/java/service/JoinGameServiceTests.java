@@ -11,7 +11,7 @@ public class JoinGameServiceTests {
     static JoinGameService joinGameService = new JoinGameService(dataAccess);
 
     @BeforeAll
-    static void addGame() throws DataAccessException {
+    static void addGame() throws DataAccessException, ServiceException {
         dataAccess.gameDataAccess.clearGames();
     }
 
