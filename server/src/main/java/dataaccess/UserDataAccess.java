@@ -5,7 +5,7 @@ import service.ServiceException;
 import java.sql.SQLException;
 
 public interface UserDataAccess {
-    void createUser(UserData user) throws DataAccessException, ServiceException, SQLException;
+    void createUser(UserData user) throws DataAccessException, ServiceException;
 
     UserData getUser(String username) throws DataAccessException, ServiceException;
 

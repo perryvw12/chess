@@ -14,6 +14,8 @@ import java.io.Reader;
 import java.util.ArrayList;
 import java.util.HashMap;
 
+import static dataaccess.DataAccess.configureDatabase;
+
 public class Server {
     DataAccess dataAccess = new DataAccess(DataAccess.Implementation.MEMORY);
     RegistrationService registrationService = new RegistrationService(dataAccess);

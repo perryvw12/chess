@@ -11,14 +11,14 @@ import static dataaccess.DataAccess.executeUpdate;
 
 public class SQLUserDAO implements  UserDataAccess{
     @Override
-    public void createUser(UserData user) throws DataAccessException, ServiceException, SQLException {
+    public void createUser(UserData user) throws ServiceException {
         var hashedPass = BCrypt.hashpw(user.password(), BCrypt.gensalt());
         var statement = "INSERT INTO userData (username, password, email) VALUES (?, ?, ?)";
         executeUpdate(statement, user.username(), hashedPass, user.email());
     }
 
     @Override
-    public UserData getUser(String username) throws DataAccessException, ServiceException {
+    public UserData getUser(String username) throws ServiceException {
         try (var conn = DatabaseManager.getConnection()) {
             var statement = "SELECT username, json FROM userData WHERE username=?";
             try (var ps = conn.prepareStatement(statement)) {

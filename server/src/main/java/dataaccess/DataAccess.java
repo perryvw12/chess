@@ -12,7 +12,7 @@ public class DataAccess {
     public AuthDataAccess authDataAccess;
     public GameDataAccess gameDataAccess;
 
-    public DataAccess(Implementation implementation) throws ServiceException, DataAccessException {
+    public DataAccess(Implementation implementation) {
         if (implementation == Implementation.MEMORY) {
             userDataAccess = new MemoryUserDAO();
             authDataAccess = new MemoryAuthDAO();
@@ -21,25 +21,22 @@ public class DataAccess {
             userDataAccess = new SQLUserDAO();
             authDataAccess = new SQLAuthDAO();
             gameDataAccess = new SQLGameDAO();
-            configureDatabase();
         }
     }
 
-    private final String[] createStatements = {
+    private static final String[] createStatements = {
             """
             CREATE TABLE IF NOT EXISTS authData (
             `authToken` int NOT NULL AUTO_INCREMENT,
             `json` TEXT DEFAULT NULL,
             PRIMARY KEY (`authToken`)
-            INDEX(authToken)
             ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci
             """,
             """
             CREATE TABLE IF NOT EXISTS gameData (
             `gameID` int NOT NULL AUTO_INCREMENT,
-            `json` TEXT NOT NULL
+            `json` TEXT NOT NULL,
             PRIMARY KEY (`gameID`)
-            INDEX(gameID)
             ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci
             """,
             """
@@ -48,12 +45,11 @@ public class DataAccess {
             `password` varchar(256) NOT NULL,
             `json` TEXT DEFAULT NULL,
             PRIMARY KEY (`username`)
-            INDEX(username)
             ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci
             """
     };
 
-    static int executeUpdate(String statement, Object... params) throws DataAccessException, SQLException, ServiceException {
+    static int executeUpdate(String statement, Object... params) throws ServiceException {
         try(var conn = DatabaseManager.getConnection()) {
             try (var ps = conn.prepareStatement(statement, Statement.RETURN_GENERATED_KEYS)) {
                 for (var i = 0; i < params.length; i++) {
@@ -80,7 +76,7 @@ public class DataAccess {
         }
     }
 
-    private void configureDatabase() throws DataAccessException, ServiceException {
+    public static void configureDatabase() throws ServiceException {
         DatabaseManager.createDatabase();
         try (var conn = DatabaseManager.getConnection()) {
             for (var statement : createStatements) {
