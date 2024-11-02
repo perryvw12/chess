@@ -47,4 +47,26 @@ public class SQLAuthDAOTests {
         String badAuthToken = "1";
         assertNotNull(dataAccess.authDataAccess.getAuth(expectedAuthData.authToken()));
     }
+
+    @Test
+    void goodGetAuth() throws ServiceException, DataAccessException {
+        var expectedAuthData = dataAccess.authDataAccess.createAuth("testUser");
+        assertEquals(expectedAuthData, dataAccess.authDataAccess.getAuth(expectedAuthData.authToken()));
+    }
+
+    @Test
+    void badGetAuth() throws ServiceException, DataAccessException {
+        var expectedAuthData = dataAccess.authDataAccess.createAuth("testUser");
+        var unexpectedAuthData = dataAccess.authDataAccess.createAuth("badUser");
+        assertNotEquals(expectedAuthData, dataAccess.authDataAccess.getAuth(unexpectedAuthData.authToken()));
+    }
+
+    @Test
+    void clearAuthData() throws ServiceException, DataAccessException {
+        var expectedAuthData = dataAccess.authDataAccess.createAuth("testUser");
+        var unexpectedAuthData = dataAccess.authDataAccess.createAuth("badUser");
+        var otherAuthData = dataAccess.authDataAccess.createAuth("badUserWhom");
+        dataAccess.authDataAccess.clearAuth();
+        assertNull(dataAccess.authDataAccess.getAuth(otherAuthData.authToken()));
+    }
 }
