@@ -11,7 +11,7 @@ public class LogoutServiceTests {
     static LogoutService logoutService = new LogoutService(dataAccess);
 
     @BeforeEach
-    void clearAuth() throws DataAccessException {
+    void clearAuth() throws DataAccessException, ServiceException {
         dataAccess.authDataAccess.clearAuth();
     }
 

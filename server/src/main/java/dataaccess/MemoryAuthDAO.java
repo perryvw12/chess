@@ -7,7 +7,6 @@ import java.util.Random;
 
 public class MemoryAuthDAO implements AuthDataAccess {
     HashMap<String, AuthData> authStorage = new HashMap<>();
-    int tokenCount = 0;
     Random randomToken = new Random();
 
     @Override
