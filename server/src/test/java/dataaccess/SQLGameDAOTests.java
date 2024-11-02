@@ -26,7 +26,7 @@ public class SQLGameDAOTests {
     }
 
     @Test
-    void addGame() throws ServiceException, DataAccessException {
+    void goodCreateGame() throws ServiceException, DataAccessException {
         var gameMap = dataAccess.gameDataAccess.createGame("testGame");
         var gameData = dataAccess.gameDataAccess.getGame(gameMap.get("gameID"));
         int gameID = gameMap.get("gameID");
@@ -34,7 +34,7 @@ public class SQLGameDAOTests {
     }
 
     @Test
-    void duplicateGame() throws ServiceException, DataAccessException {
+    void badCreateGame() throws ServiceException, DataAccessException {
         var gameMap = dataAccess.gameDataAccess.createGame("testGame");
         var statement = "INSERT INTO gameData (gameID, json) VALUES (?, ?)";
         assertThrows(ServiceException.class, () ->
@@ -42,12 +42,22 @@ public class SQLGameDAOTests {
     }
 
     @Test
-    void listAllGames() throws ServiceException, DataAccessException {
+    void goodListAllGames() throws ServiceException, DataAccessException {
         dataAccess.gameDataAccess.createGame("testGame");
         dataAccess.gameDataAccess.createGame("testGame2");
         dataAccess.gameDataAccess.createGame("testGame3");
         var gameList = dataAccess.gameDataAccess.listGames();
         assertEquals(3, gameList.size());
+    }
+
+    @Test
+    void badListAllGames() throws ServiceException, DataAccessException {
+        dataAccess.gameDataAccess.createGame("testGame");
+        dataAccess.gameDataAccess.createGame("testGame2");
+        dataAccess.gameDataAccess.createGame("testGame3");
+        var gameList = dataAccess.gameDataAccess.listGames();
+        dataAccess.gameDataAccess.createGame("unexpectedGame");
+        assertNotEquals(4, gameList.size());
     }
 
     @Test
@@ -67,5 +77,16 @@ public class SQLGameDAOTests {
         var testData = new GameData(gameID, "newUserBlack", null, "testGame", new ChessGame());
         dataAccess.gameDataAccess.updateGame(badGameID, testData);
         assertNotEquals(testData, dataAccess.gameDataAccess.getGame(gameID));
+    }
+
+    @Test
+    void clearGameData() throws ServiceException, DataAccessException {
+        dataAccess.gameDataAccess.createGame("testGame");
+        dataAccess.gameDataAccess.createGame("testGame2");
+        dataAccess.gameDataAccess.createGame("testGame3");
+        dataAccess.gameDataAccess.createGame("unexpectedGame");
+        dataAccess.gameDataAccess.clearGames();
+        var gameList = dataAccess.gameDataAccess.listGames();
+        assertEquals(0, gameList.size());
     }
 }
