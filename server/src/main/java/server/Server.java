@@ -26,6 +26,7 @@ public class Server {
     ListGameService listGameService = new ListGameService(dataAccess);
     JoinGameService joinGameService = new JoinGameService(dataAccess);
 
+
     public int run(int desiredPort) {
         Spark.port(desiredPort);
 

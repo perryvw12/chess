@@ -22,6 +22,11 @@ public class DataAccess {
             userDataAccess = new SQLUserDAO();
             authDataAccess = new SQLAuthDAO();
             gameDataAccess = new SQLGameDAO();
+            try {
+                configureDatabase();
+            } catch (Throwable ex) {
+                System.out.printf("Unable to start server: %s%n", ex.getMessage());
+            }
         }
     }
 
