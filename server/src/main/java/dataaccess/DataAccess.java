@@ -7,6 +7,7 @@ import java.sql.SQLException;
 import java.sql.Statement;
 import static java.sql.Types.NULL;
 
+
 public class DataAccess {
     public UserDataAccess userDataAccess;
     public AuthDataAccess authDataAccess;
