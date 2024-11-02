@@ -20,7 +20,7 @@ public class RegistrationServiceTests {
     void goodRegistration() throws DataAccessException, ServiceException {
         UserData testUser = new UserData("testUser", "password", "test@gmail.com");
         registrationService.registerUser(testUser);
-        assertEquals(testUser, dataAccess.userDataAccess.getUser(testUser.username()));
+        assertEquals(testUser.username(), dataAccess.userDataAccess.getUser(testUser.username()).username());
     }
 
     @Test

@@ -12,26 +12,24 @@ public class SQLAuthDAO implements AuthDataAccess{
 
     @Override
     public AuthData createAuth(String username) throws DataAccessException, ServiceException {
-        int authToken = idGenerator.nextInt(1000);
+        var authToken = Integer.toString(idGenerator.nextInt());
         var statement = "INSERT INTO authData (authToken, username) VALUES (?, ?)";
         executeUpdate(statement, authToken, username);
-        return new AuthData(Integer.toString(authToken), username);
+        return new AuthData(authToken, username);
     }
 
     @Override
     public void deleteAuth(String authToken) throws ServiceException {
-        var authTokenInt = Integer.parseInt(authToken);
         var statement = "DELETE from authData WHERE authToken=?";
-        executeUpdate(statement, authTokenInt);
+        executeUpdate(statement, authToken);
     }
 
     @Override
     public AuthData getAuth(String authToken) throws ServiceException {
-        var authTokenInt = Integer.parseInt(authToken);
         try (var conn = DatabaseManager.getConnection()) {
             var statement = "SELECT authToken, username FROM authData WHERE authToken=?";
             try (var ps = conn.prepareStatement(statement)) {
-                ps.setInt(1, authTokenInt);
+                ps.setString(1, authToken);
                 try (var rs = ps.executeQuery()) {
                     if (rs.next()) {
                         return new AuthData(authToken,  rs.getString("username"));

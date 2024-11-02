@@ -10,8 +10,9 @@ public class SQLUserDAO implements  UserDataAccess{
     @Override
     public void createUser(UserData user) throws ServiceException {
         var hashedPass = BCrypt.hashpw(user.password(), BCrypt.gensalt());
+        var hashedUser = new UserData(user.username(), hashedPass, user.email());
         var statement = "INSERT INTO userData (username, password, json) VALUES (?, ?, ?)";
-        executeUpdate(statement, user.username(), hashedPass, new Gson().toJson(user));
+        executeUpdate(statement, user.username(), hashedPass, new Gson().toJson(hashedUser));
     }
 
     @Override

@@ -3,6 +3,7 @@ package service;
 import dataaccess.DataAccess;
 import dataaccess.DataAccessException;
 import model.AuthData;
+import org.mindrot.jbcrypt.BCrypt;
 
 import java.util.Objects;
 
@@ -17,7 +18,7 @@ public class LoginService {
        var userData = dataAccess.userDataAccess.getUser(username);
        if(userData == null) {
            throw new ServiceException(401, "Error: unauthorized");
-       } else if(!Objects.equals(userData.password(), password)) {
+       } else if(!BCrypt.checkpw(password, userData.password())) {
            throw new ServiceException(401, "Error: unauthorized");
        } else {
            return dataAccess.authDataAccess.createAuth(userData.username());

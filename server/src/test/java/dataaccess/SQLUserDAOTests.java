@@ -27,7 +27,7 @@ public class SQLUserDAOTests {
         var testUser = new UserData("test", "pass", "email");
         dataAccess.userDataAccess.createUser(testUser);
         var actualUser = dataAccess.userDataAccess.getUser("test");
-        assertEquals(testUser, actualUser);
+        assertEquals(testUser.username(), actualUser.username());
     }
 
     @Test

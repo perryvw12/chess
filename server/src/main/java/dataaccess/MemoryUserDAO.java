@@ -1,6 +1,7 @@
 package dataaccess;
 
 import model.UserData;
+import org.mindrot.jbcrypt.BCrypt;
 
 import javax.xml.crypto.Data;
 import java.util.HashMap;
@@ -10,7 +11,9 @@ public class MemoryUserDAO implements UserDataAccess {
 
     @Override
     public void createUser(UserData newUser) throws DataAccessException {
-        userStorage.put(newUser.username(), newUser);
+        var hashedPass = BCrypt.hashpw(newUser.password(), BCrypt.gensalt());
+        var hashedUser = new UserData(newUser.username(), hashedPass, newUser.email());
+        userStorage.put(newUser.username(), hashedUser);
     }
 
     @Override
