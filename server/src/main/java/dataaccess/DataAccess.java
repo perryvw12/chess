@@ -30,7 +30,7 @@ public class DataAccess {
         }
     }
 
-    private static final String[] createStatements = {
+    private static final String[] CREATESTATEMENTS = {
             """
             CREATE TABLE IF NOT EXISTS authData (
             `authToken` varchar(256) NOT NULL,
@@ -85,7 +85,7 @@ public class DataAccess {
     public static void configureDatabase() throws ServiceException {
         DatabaseManager.createDatabase();
         try (var conn = DatabaseManager.getConnection()) {
-            for (var statement : createStatements) {
+            for (var statement : CREATESTATEMENTS) {
                 try (var preparedStatement = conn.prepareStatement(statement)) {
                     preparedStatement.executeUpdate();
                 }
