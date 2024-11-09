@@ -1,7 +1,7 @@
 package dataaccess;
 
 import model.AuthData;
-import service.ServiceException;
+import exception.ServiceException;
 
 import java.util.Random;
 

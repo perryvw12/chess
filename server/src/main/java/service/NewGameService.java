@@ -2,11 +2,9 @@ package service;
 
 import dataaccess.DataAccess;
 import dataaccess.DataAccessException;
-import model.AuthData;
-import model.GameData;
+import exception.ServiceException;
 
 import java.util.HashMap;
-import java.util.Objects;
 
 public class NewGameService {
     DataAccess dataAccess;

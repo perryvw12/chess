@@ -1,7 +1,7 @@
 package dataaccess;
 
 import model.AuthData;
-import service.ServiceException;
+import exception.ServiceException;
 
 public interface AuthDataAccess {
     AuthData createAuth(String username) throws DataAccessException, ServiceException;

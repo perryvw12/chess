@@ -2,10 +2,9 @@ package service;
 
 import dataaccess.DataAccess;
 import dataaccess.DataAccessException;
+import exception.ServiceException;
 import model.AuthData;
 import org.mindrot.jbcrypt.BCrypt;
-
-import java.util.Objects;
 
 public class LoginService {
     DataAccess dataAccess;

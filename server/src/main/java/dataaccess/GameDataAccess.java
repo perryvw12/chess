@@ -1,7 +1,6 @@
 package dataaccess;
-import chess.ChessGame;
 import model.GameData;
-import service.ServiceException;
+import exception.ServiceException;
 
 import java.util.ArrayList;
 import java.util.HashMap;

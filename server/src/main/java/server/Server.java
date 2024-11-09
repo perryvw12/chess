@@ -4,17 +4,14 @@ import com.google.gson.Gson;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import dataaccess.*;
-import model.AuthData;
+import exception.ServiceException;
 import model.GameData;
 import model.UserData;
 import service.*;
 import spark.*;
 
-import java.io.Reader;
 import java.util.ArrayList;
 import java.util.HashMap;
-
-import static dataaccess.DataAccess.configureDatabase;
 
 public class Server {
     DataAccess dataAccess = new DataAccess(DataAccess.Implementation.SQL);

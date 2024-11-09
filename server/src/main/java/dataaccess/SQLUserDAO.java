@@ -3,7 +3,7 @@ package dataaccess;
 import com.google.gson.Gson;
 import model.UserData;
 import org.mindrot.jbcrypt.BCrypt;
-import service.ServiceException;
+import exception.ServiceException;
 import static dataaccess.DataAccess.executeUpdate;
 
 public class SQLUserDAO implements  UserDataAccess{

@@ -3,7 +3,7 @@ package dataaccess;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import service.ServiceException;
+import exception.ServiceException;
 import static dataaccess.DataAccess.configureDatabase;
 import static org.junit.jupiter.api.Assertions.*;
 

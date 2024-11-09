@@ -1,8 +1,6 @@
 package dataaccess;
 import model.UserData;
-import service.ServiceException;
-
-import java.sql.SQLException;
+import exception.ServiceException;
 
 public interface UserDataAccess {
     void createUser(UserData user) throws DataAccessException, ServiceException;

@@ -2,12 +2,10 @@ package service;
 
 import dataaccess.DataAccess;
 import dataaccess.DataAccessException;
-import model.AuthData;
+import exception.ServiceException;
 import model.GameData;
 
 import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Objects;
 
 public class ListGameService {
     DataAccess dataAccess;

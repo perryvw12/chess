@@ -2,6 +2,7 @@ package service;
 
 import dataaccess.DataAccess;
 import dataaccess.DataAccessException;
+import exception.ServiceException;
 import model.GameData;
 
 import java.util.Objects;
