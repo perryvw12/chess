@@ -2,9 +2,14 @@ package server;
 
 import com.google.gson.Gson;
 import exception.ServiceException;
+import model.AuthData;
+import model.GameData;
+import model.UserData;
 
 import java.io.*;
 import java.net.*;
+import java.util.ArrayList;
+import java.util.HashMap;
 
 public class ServerFacade {
     String serverUrl;
@@ -13,15 +18,41 @@ public class ServerFacade {
         serverUrl = url;
     }
 
-    private <T> T makeRequest(String method, String path, Object request, Class<T> responseClass) throws ServiceException {
+    public AuthData registerUser(UserData newUser) throws ServiceException {
+        var path = "/user";
+        return this.makeRequest("POST", path, newUser, null, AuthData.class);
+    }
+
+    public AuthData loginUser(HashMap<String, String> loginReq) throws ServiceException {
+        var path = "/session";
+        return this.makeRequest("POST", path, loginReq, null, AuthData.class);
+    }
+
+    public HashMap<String, ArrayList<GameData>> listGames(HashMap<String, String> listGameReq) throws ServiceException {
+        var path = "/game";
+        var authToken = listGameReq.get("authorization");
+        return this.makeRequest("GET", path, null, authToken, HashMap.class);
+    }
+
+    public void createGame(HashMap<String, String> createGameData) throws ServiceException {
+        var path = "/game";
+        HashMap<String, String> createGameReq = new HashMap<>();
+        createGameReq.put("gameName", createGameData.get("gameName"));
+        var authToken = createGameData.get("authorization");
+        this.makeRequest("POST", path, createGameReq, authToken, HashMap.class);
+    }
+
+    private <T> T makeRequest(String method, String path, Object request, String header, Class<T> responseClass) throws ServiceException {
         try {
             URL url = (new URI(serverUrl + path)).toURL();
             HttpURLConnection http = (HttpURLConnection) url.openConnection();
             http.setRequestMethod(method);
             http.setDoOutput(true);
 
+            if(header != null) {
+                http.setRequestProperty("authorization", header);
+            }
             writeBody(request, http);
-            http.connect();
             throwIfNotSuccessful(http);
             return readBody(http, responseClass);
         } catch (Exception ex) {

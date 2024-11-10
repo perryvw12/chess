@@ -1,15 +1,17 @@
 package client;
+import exception.ServiceException;
+import model.UserData;
 import server.ServerFacade;
 
 import java.util.Arrays;
+import java.util.HashMap;
 
 public class ChessClientPreLogin {
-    String serverUrl;
     ServerFacade server;
+    String authToken = null;
 
-    public ChessClientPreLogin(String serverUrl) {
-        this.serverUrl = serverUrl;
-        server = new ServerFacade();
+    public ChessClientPreLogin(ServerFacade server) {
+        this.server = server;
     }
 
     public String eval(String input) {
@@ -21,14 +23,50 @@ public class ChessClientPreLogin {
                 case "register" -> register(params);
                 case "login" -> login(params);
                 case "quit" -> "quit";
-                case "help" -> help();
+                default -> help();
             };
-        } catch (Throwable ex) {
+        } catch (ServiceException ex) {
             return ex.getMessage();
         }
     }
 
-    public String register(String... params) {
+    public String register(String... params) throws ServiceException {
+        if (params.length >= 3) {
+            var username = params[0];
+            var password = params[1];
+            var email = params[2];
+            UserData newUser = new UserData(username, password, email);
+            var authData = server.registerUser(newUser);
+            authToken = authData.authToken();
+            return String.format("You are logged in as %s.%n", username);
+        }
+        throw new ServiceException(400, "Expected: <USERNAME> <PASSWORD> <EMAIL>");
+    }
 
+    public String login(String... params) throws ServiceException {
+        if (params.length >= 2) {
+            var username = params[0];
+            var password = params[1];
+            HashMap<String, String> loginReq = new HashMap<>();
+            loginReq.put("username", username);
+            loginReq.put("password", password);
+            var authData = server.loginUser(loginReq);
+            authToken = authData.authToken();
+            return String.format("You are logged in as %s.%n", username);
+        }
+        throw new ServiceException(400, "Expected: <USERNAME> <PASSWORD>");
+    }
+
+    public String help() {
+        return """
+                - register <USERNAME> <PASSWORD> <EMAIL>
+                - login <USERNAME> <PASSWORD>
+                - quit
+                - help
+                """;
+    }
+
+    public String isLoggedIn() {
+        return authToken;
     }
 }
