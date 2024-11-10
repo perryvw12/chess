@@ -57,7 +57,7 @@ public class ChessClientPostLogin {
         ArrayList<GameData> gameDataList = deserializedResults.get("games");
         StringBuilder finalResult = new StringBuilder();
         for (GameData gameData : gameDataList) {
-            finalResult.append(String.format("Game:%s, ID:%s%n", gameData.gameName(), gameData.gameID()));
+            finalResult.append(String.format("Game:%s, ID:%s, WhitePlayer:%s, BlackPlayer:%s%n", gameData.gameName(), gameData.gameID(), gameData.whiteUsername(), gameData.blackUsername()));
         }
         return finalResult.toString();
     }
