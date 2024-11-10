@@ -1,12 +1,14 @@
 package server;
 
 import com.google.gson.Gson;
+import com.google.gson.reflect.TypeToken;
 import exception.ServiceException;
 import model.AuthData;
 import model.GameData;
 import model.UserData;
 
 import java.io.*;
+import java.lang.reflect.Type;
 import java.net.*;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -31,6 +33,7 @@ public class ServerFacade {
     public HashMap<String, ArrayList<GameData>> listGames(HashMap<String, String> listGameReq) throws ServiceException {
         var path = "/game";
         var authToken = listGameReq.get("authorization");
+        Type type = new TypeToken<HashMap<String, ArrayList<GameData>>>(){}.getType();
         return this.makeRequest("GET", path, null, authToken, HashMap.class);
     }
 

@@ -1,10 +1,15 @@
 package client;
 
+import com.google.gson.Gson;
+import com.google.gson.reflect.TypeToken;
 import exception.ServiceException;
+import model.GameData;
 import server.ServerFacade;
-
+import java.lang.reflect.Type;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
+import java.util.Map;
 
 public class ChessClientPostLogin {
     String authToken;
@@ -47,7 +52,14 @@ public class ChessClientPostLogin {
         HashMap<String, String> listGameReq = new HashMap<>();
         listGameReq.put("authorization", authToken);
         var results = server.listGames(listGameReq);
-        return results.values().toString();
+        Type type = new TypeToken<HashMap<String, ArrayList<GameData>>>(){}.getType();
+        HashMap<String, ArrayList<GameData>> deserializedResults = new Gson().fromJson(String.valueOf(results), type);
+        ArrayList<GameData> gameDataList = deserializedResults.get("games");
+        StringBuilder finalResult = new StringBuilder();
+        for (GameData gameData : gameDataList) {
+            finalResult.append(String.format("Game:%s, ID:%s%n", gameData.gameName(), gameData.gameID()));
+        }
+        return finalResult.toString();
     }
 
     public String help() {
