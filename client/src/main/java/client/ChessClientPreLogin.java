@@ -66,7 +66,11 @@ public class ChessClientPreLogin {
                 """;
     }
 
-    public String isLoggedIn() {
+    public String getAuth() {
         return authToken;
+    }
+
+    public void logout() {
+        authToken = null;
     }
 }

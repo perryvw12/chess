@@ -28,6 +28,7 @@ public class ChessClientPostLogin {
             return switch (cmd) {
                 case "create" -> createGame(params);
                 case "list" -> listGames();
+                case "logout" -> logout();
                 case "quit" -> "quit";
                 default -> help();
             };
@@ -62,6 +63,12 @@ public class ChessClientPostLogin {
         return finalResult.toString();
     }
 
+    public String logout() throws ServiceException {
+        server.logout(authToken);
+        authToken = null;
+        return "You have logged out";
+    }
+
     public String help() {
         return """
                 - create <NAME> - creates a game
@@ -74,5 +81,8 @@ public class ChessClientPostLogin {
                 """;
     }
 
+    public String getAuth() {
+        return authToken;
+    }
 
 }

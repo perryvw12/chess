@@ -2,12 +2,14 @@ package client;
 
 import server.ServerFacade;
 
+import java.util.Objects;
 import java.util.Scanner;
 
 import static ui.EscapeSequences.*;
 
 public class Repl {
     ServerFacade server;
+    String clientState = "loggedOut";
 
     public Repl(String serverUrl) {
         server = new ServerFacade(serverUrl);
@@ -27,8 +29,11 @@ public class Repl {
             try {
                 result = client.eval(line);
                 System.out.print(SET_TEXT_COLOR_BLUE + result);
-                if(client.isLoggedIn() != null) {
-                    postLoginRun(client.isLoggedIn());
+                if(client.getAuth() != null) {
+                    clientState = "loggedIn";
+                    postLoginRun(client.getAuth());
+                    client.logout();
+                    System.out.print(client.help());
                 }
             } catch (Throwable ex) {
                 var msg = ex.toString();
@@ -44,13 +49,16 @@ public class Repl {
 
         Scanner scanner = new Scanner(System.in);
         var result = "";
-        while (!result.equals("quit")) {
+        while (Objects.equals(clientState, "loggedIn")) {
             printPrompt();
             String line = scanner.nextLine();
 
             try {
                 result = client.eval(line);
                 System.out.print(SET_TEXT_COLOR_BLUE + result);
+                if(client.getAuth() == null) {
+                    clientState = "loggedOut";
+                }
 
             } catch (Throwable ex) {
                 var msg = ex.toString();

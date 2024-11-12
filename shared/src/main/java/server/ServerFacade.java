@@ -45,6 +45,11 @@ public class ServerFacade {
         this.makeRequest("POST", path, createGameReq, authToken, HashMap.class);
     }
 
+    public void logout(String authToken) throws ServiceException {
+        var path = "/session";
+        this.makeRequest("DELETE", path, null, authToken, null);
+    }
+
     private <T> T makeRequest(String method, String path, Object request, String header, Class<T> responseClass) throws ServiceException {
         try {
             URL url = (new URI(serverUrl + path)).toURL();
