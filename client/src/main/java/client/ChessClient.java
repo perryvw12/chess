@@ -17,7 +17,7 @@ public class ChessClient {
     String authToken = null;
     ServerFacade server;
     clientState state = clientState.LOGGEDOUT;
-    HashMap<Integer, ChessGame> gameList;
+    HashMap<Integer, ChessGame> gameList = new HashMap<>();
 
 
     public ChessClient(ServerFacade server) {
