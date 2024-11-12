@@ -50,9 +50,12 @@ public class ServerFacade {
         this.makeRequest("DELETE", path, null, authToken, null);
     }
 
-    public void joinGame(String playerColor, String gameID) {
+    public void joinGame(String playerColor, String gameID, String authToken) throws ServiceException {
         var path = "/game";
-
+        HashMap<String, String> joinRequest = new HashMap<>();
+        joinRequest.put("playerColor", playerColor);
+        joinRequest.put("gameID", gameID);
+        this.makeRequest("PUT", path, joinRequest, authToken, null);
     }
 
     private <T> T makeRequest(String method, String path, Object request, String header, Class<T> responseClass) throws ServiceException {

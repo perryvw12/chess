@@ -59,7 +59,9 @@ public class Repl {
                 if(client.getAuth() == null) {
                     clientState = "loggedOut";
                 }
+                if(client.isPlaying()) {
 
+                }
             } catch (Throwable ex) {
                 var msg = ex.toString();
                 System.out.print(msg);

@@ -15,7 +15,8 @@ import java.util.Map;
 public class ChessClientPostLogin {
     String authToken;
     ServerFacade server;
-    HashMap<Integer, ChessGame> gameList;
+    boolean isPlaying = false;
+    HashMap<Integer, ChessGame> gameList = new HashMap<>();
 
     public ChessClientPostLogin(ServerFacade server, String authToken) {
         this.authToken = authToken;
@@ -76,7 +77,8 @@ public class ChessClientPostLogin {
         if(params.length >= 2) {
             var gameID = params[0];
             var playerColor = params[1];
-            server.joinGame(playerColor, gameID);
+            server.joinGame(playerColor, gameID, authToken);
+            isPlaying = true;
         }
         throw new ServiceException(400, "Expected: <ID> [WHITE|BLACK]");
     }
@@ -95,6 +97,14 @@ public class ChessClientPostLogin {
 
     public String getAuth() {
         return authToken;
+    }
+
+    public HashMap<Integer, ChessGame> getGameList() {
+        return gameList;
+    }
+
+    public boolean isPlaying() {
+        return isPlaying;
     }
 
 }
