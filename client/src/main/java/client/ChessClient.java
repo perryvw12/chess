@@ -7,11 +7,14 @@ import exception.ServiceException;
 import model.GameData;
 import model.UserData;
 import server.ServerFacade;
+import ui.BoardDrawer;
 
 import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
+
+import static ui.BoardDrawer.drawBoardWhite;
 
 public class ChessClient {
     String authToken = null;
@@ -35,7 +38,7 @@ public class ChessClient {
                 return switch (cmd) {
                     case "create" -> createGame(params);
                     case "list" -> listGames();
-                    case "join" -> joinGame();
+                    case "join" -> joinGame(params);
                     case "logout" -> logout();
                     case "quit" -> "quit";
                     default -> postHelp();
@@ -62,7 +65,7 @@ public class ChessClient {
             var authData = server.registerUser(newUser);
             authToken = authData.authToken();
             state = clientState.LOGGEDIN;
-            return String.format("You are logged in as %s.%n", username);
+            return String.format("You are logged in as %s.%n%s", username, postHelp());
         }
         throw new ServiceException(400, "Expected: <USERNAME> <PASSWORD> <EMAIL>");
     }
@@ -77,7 +80,7 @@ public class ChessClient {
             var authData = server.loginUser(loginReq);
             authToken = authData.authToken();
             state = clientState.LOGGEDIN;
-            return String.format("You are logged in as %s.%n", username);
+            return String.format("You are logged in as %s.%n%s", username, postHelp());
         }
         throw new ServiceException(400, "Expected: <USERNAME> <PASSWORD>");
     }
@@ -123,6 +126,7 @@ public class ChessClient {
             var gameID = params[0];
             var playerColor = params[1];
             server.joinGame(playerColor, gameID, authToken);
+            return drawBoardWhite(gameList.get(Integer.parseInt(gameID)));
         }
         throw new ServiceException(400, "Expected: <ID> [WHITE|BLACK]");
     }
@@ -131,7 +135,7 @@ public class ChessClient {
         server.logout(authToken);
         authToken = null;
         state = clientState.LOGGEDOUT;
-        return "You have logged out";
+        return String.format("You have logged out.%n%s", preHelp());
     }
 
     public String postHelp() {
