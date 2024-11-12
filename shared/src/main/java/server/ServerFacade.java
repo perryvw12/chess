@@ -50,6 +50,11 @@ public class ServerFacade {
         this.makeRequest("DELETE", path, null, authToken, null);
     }
 
+    public void joinGame(String playerColor, String gameID) {
+        var path = "/game";
+
+    }
+
     private <T> T makeRequest(String method, String path, Object request, String header, Class<T> responseClass) throws ServiceException {
         try {
             URL url = (new URI(serverUrl + path)).toURL();

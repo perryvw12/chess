@@ -1,5 +1,6 @@
 package client;
 
+import chess.ChessGame;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 import exception.ServiceException;
@@ -14,6 +15,7 @@ import java.util.Map;
 public class ChessClientPostLogin {
     String authToken;
     ServerFacade server;
+    HashMap<Integer, ChessGame> gameList;
 
     public ChessClientPostLogin(ServerFacade server, String authToken) {
         this.authToken = authToken;
@@ -59,6 +61,7 @@ public class ChessClientPostLogin {
         StringBuilder finalResult = new StringBuilder();
         for (GameData gameData : gameDataList) {
             finalResult.append(String.format("Game:%s, ID:%s, WhitePlayer:%s, BlackPlayer:%s%n", gameData.gameName(), gameData.gameID(), gameData.whiteUsername(), gameData.blackUsername()));
+            gameList.put(gameData.gameID(), gameData.chessGame());
         }
         return finalResult.toString();
     }
@@ -67,6 +70,15 @@ public class ChessClientPostLogin {
         server.logout(authToken);
         authToken = null;
         return "You have logged out";
+    }
+
+    public String joinGame(String... params) throws ServiceException {
+        if(params.length >= 2) {
+            var gameID = params[0];
+            var playerColor = params[1];
+            server.joinGame(playerColor, gameID);
+        }
+        throw new ServiceException(400, "Expected: <ID> [WHITE|BLACK]");
     }
 
     public String help() {
