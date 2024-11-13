@@ -41,6 +41,7 @@ public class ChessClient {
                     case "list" -> listGames();
                     case "join" -> joinGame(params);
                     case "logout" -> logout();
+                    case "observe" -> observeGame(params);
                     case "quit" -> "quit";
                     default -> postHelp();
                 };
@@ -138,6 +139,15 @@ public class ChessClient {
         authToken = null;
         state = clientState.LOGGEDOUT;
         return String.format("You have logged out.%n%s", preHelp());
+    }
+
+    public String observeGame(String... params) throws ServiceException {
+        if(params.length >= 1) {
+            var gameID = params[0];
+            ChessGame game = gameList.get(Integer.parseInt(gameID));
+            return String.format("%s%n%s", drawBoardWhite(game), drawBoardBlack(game));
+        }
+        throw new ServiceException(400,"Expected: <ID>");
     }
 
     public String postHelp() {
