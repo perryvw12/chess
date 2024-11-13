@@ -125,7 +125,7 @@ public class ChessClient {
     public String joinGame(String... params) throws ServiceException {
         if(params.length >= 2) {
             var gameID = params[0];
-            var playerColor = params[1];
+            var playerColor = params[1].toUpperCase();
             server.joinGame(playerColor, gameID, authToken);
             ChessGame game = gameList.get(Integer.parseInt(gameID));
             return String.format("%s%n%s", drawBoardWhite(game), drawBoardBlack(game));
