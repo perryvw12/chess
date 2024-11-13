@@ -58,6 +58,10 @@ public class ServerFacade {
         this.makeRequest("PUT", path, joinRequest, authToken, null);
     }
 
+    public void clearAll() throws ServiceException {
+        makeRequest("DELETE", "/db", null, null, null);
+    }
+
     private <T> T makeRequest(String method, String path, Object request, String header, Class<T> responseClass) throws ServiceException {
         try {
             URL url = (new URI(serverUrl + path)).toURL();
