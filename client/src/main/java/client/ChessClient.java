@@ -14,6 +14,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 
+import static ui.BoardDrawer.drawBoardBlack;
 import static ui.BoardDrawer.drawBoardWhite;
 
 public class ChessClient {
@@ -126,7 +127,8 @@ public class ChessClient {
             var gameID = params[0];
             var playerColor = params[1];
             server.joinGame(playerColor, gameID, authToken);
-            return drawBoardWhite(gameList.get(Integer.parseInt(gameID)));
+            ChessGame game = gameList.get(Integer.parseInt(gameID));
+            return String.format("%s%n%s", drawBoardWhite(game), drawBoardBlack(game));
         }
         throw new ServiceException(400, "Expected: <ID> [WHITE|BLACK]");
     }
