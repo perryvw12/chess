@@ -3,8 +3,12 @@ package dataaccess;
 import chess.ChessGame;
 import com.google.gson.Gson;
 import exception.ServiceException;
+
+import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.sql.Types;
+
 import static java.sql.Types.NULL;
 
 
@@ -56,29 +60,30 @@ public class DataAccess {
     };
 
     static int executeUpdate(String statement, Object... params) throws ServiceException {
-        try(var conn = DatabaseManager.getConnection()) {
-            try (var ps = conn.prepareStatement(statement, Statement.RETURN_GENERATED_KEYS)) {
-                for (var i = 0; i < params.length; i++) {
-                    var param = params[i];
-                    switch (param) {
-                        case String p -> ps.setString(i + 1, p);
-                        case Integer p -> ps.setInt(i + 1, p);
-                        case ChessGame p -> ps.setString(i + 1, new Gson().toJson(p));
-                        case null -> ps.setNull(i + 1, NULL);
-                        default -> {
-                        }
-                    }
-                }
-                ps.executeUpdate();
+        try (var conn = DatabaseManager.getConnection();
+             var ps = conn.prepareStatement(statement, Statement.RETURN_GENERATED_KEYS)) {
 
-                var rs = ps.getGeneratedKeys();
-                if (rs.next()) {
-                    return rs.getInt(1);
-                }
-                return 0;
-            }
+            setParameters(ps, params);
+
+            ps.executeUpdate();
+            var rs = ps.getGeneratedKeys();
+            return rs.next() ? rs.getInt(1) : 0;
+
         } catch (SQLException e) {
-            throw new ServiceException(500, "unable to update database");
+            throw new ServiceException(500, "Unable to update database");
+        }
+    }
+
+    private static void setParameters(PreparedStatement ps, Object... params) throws SQLException {
+        for (var i = 0; i < params.length; i++) {
+            var param = params[i];
+            switch (param) {
+                case String p -> ps.setString(i + 1, p);
+                case Integer p -> ps.setInt(i + 1, p);
+                case ChessGame p -> ps.setString(i + 1, new Gson().toJson(p));
+                case null -> ps.setNull(i + 1, Types.NULL);
+                default -> throw new SQLException("Unsupported parameter type: " + param.getClass());
+            }
         }
     }
 
