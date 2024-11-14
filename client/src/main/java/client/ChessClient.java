@@ -19,7 +19,7 @@ public class ChessClient {
     String authToken = null;
     ServerFacade server;
     ClientState state = ClientState.LOGGEDOUT;
-    HashMap<Integer, ChessGame> gameList = new HashMap<>();
+    HashMap<Integer, GameData> gameList = new HashMap<>();
 
 
     public ChessClient(ServerFacade server) {
@@ -118,7 +118,7 @@ public class ChessClient {
         for (GameData gameData : gameDataList) {
             finalResult.append(String.format("Game:%s, ID:%s, WhitePlayer:%s, BlackPlayer:%s%n", gameData.gameName(),
                     IdCounter, gameData.whiteUsername(), gameData.blackUsername()));
-            gameList.put(IdCounter++, gameData.chessGame());
+            gameList.put(IdCounter++, gameData);
         }
         return finalResult.toString();
     }
@@ -127,9 +127,9 @@ public class ChessClient {
         if(params.length >= 2) {
             var gameID = params[0];
             var playerColor = params[1].toUpperCase();
-            server.joinGame(playerColor, gameID, authToken);
-            ChessGame game = gameList.get(Integer.parseInt(gameID));
-            return String.format("%s%n%s", drawBoardWhite(game), drawBoardBlack(game));
+            var gameData = gameList.get(Integer.parseInt(gameID));
+            server.joinGame(playerColor, Integer.toString(gameData.gameID()), authToken);
+            return String.format("%s%n%s", drawBoardWhite(gameData.chessGame()), drawBoardBlack(gameData.chessGame()));
         }
         throw new ServiceException(400, "Expected: <ID> [WHITE|BLACK]");
     }
@@ -144,7 +144,7 @@ public class ChessClient {
     public String observeGame(String... params) throws ServiceException {
         if(params.length >= 1) {
             var gameID = params[0];
-            ChessGame game = gameList.get(Integer.parseInt(gameID));
+            ChessGame game = (gameList.get(Integer.parseInt(gameID))).chessGame();
             return String.format("%s%n%s", drawBoardWhite(game), drawBoardBlack(game));
         }
         throw new ServiceException(400,"Expected: <ID>");
