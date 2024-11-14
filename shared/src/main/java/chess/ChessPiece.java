@@ -123,27 +123,26 @@ public class ChessPiece {
     private void pawnAttack(ChessBoard board, ChessPosition myPosition, int rowMove, int colMove, Collection<ChessMove> moves) {
         int row = myPosition.getRow();
         int col = myPosition.getColumn();
-
         ChessPosition newPos = new ChessPosition(row + rowMove, col + colMove);
 
-        if (newPos.getColumn() >= 1 & newPos.getColumn() <= 8) {
-            ChessPiece pieceAtPos = board.getPiece(newPos);
+        if (newPos.getColumn() < 1 || newPos.getColumn() > 8) {
+            return;
+        }
 
-            if (pieceAtPos != null) {
-                if (pieceAtPos.getTeamColor() != pieceColor) {
-                if (newPos.getRow() == 8 || newPos.getRow() == 1) {
-                for (PieceType pieces : PieceType.values()) {
-                if (pieces == PieceType.KING || pieces == PieceType.PAWN) {
-                continue;
-                } else {
-                moves.add(new ChessMove(myPosition, newPos, pieces));
-                }
-                }
-                } else {
-                moves.add(new ChessMove(myPosition, newPos, null));
-                }
+        ChessPiece pieceAtPos = board.getPiece(newPos);
+
+        if (pieceAtPos == null || pieceAtPos.getTeamColor() == pieceColor) {
+            return;
+        }
+
+        if (newPos.getRow() == 8 || newPos.getRow() == 1) {
+            for (PieceType pieces : PieceType.values()) {
+                if (pieces != PieceType.KING && pieces != PieceType.PAWN) {
+                    moves.add(new ChessMove(myPosition, newPos, pieces));
                 }
             }
+        } else {
+            moves.add(new ChessMove(myPosition, newPos, null));
         }
     }
 
