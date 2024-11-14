@@ -55,17 +55,16 @@ public class ChessPiece {
 
             ChessPosition newPosition = new ChessPosition(row, col);
             ChessPiece pieceAtNewPosition = board.getPiece(newPosition);
-            if (pieceAtNewPosition == null) {
+
+            if (pieceAtNewPosition == null || pieceAtNewPosition.getTeamColor() != pieceColor) {
                 moves.add(new ChessMove(myPosition, newPosition, null));
-            } else {
-                if (pieceAtNewPosition.getTeamColor() != pieceColor) {
-                    moves.add(new ChessMove(myPosition, newPosition, null));
-                }
             }
+
         } else {
             while (true) {
                 row += rowMove;
                 col += colMove;
+
                 if (row < 1 || row > 8 || col < 1 || col > 8) {
                     break;
                 }
@@ -78,7 +77,6 @@ public class ChessPiece {
                 } else {
                     if (pieceAtNewPosition.getTeamColor() != pieceColor) {
                         moves.add(new ChessMove(myPosition, newPosition, null));
-                        break;
                     }
                     break;
                 }
