@@ -12,27 +12,43 @@ public class BoardDrawer {
     public static String drawBoard(ChessGame game, boolean isWhitePerspective) {
         ChessBoard board = game.getBoard();
         StringBuilder drawBoard = new StringBuilder(EscapeSequences.ERASE_SCREEN);
+
+        // Adjust the labels for the column headers based on the perspective
         String letters = isWhitePerspective
                 ? String.format("%sa  \u2009b  \u2009\u2009c  \u2009\u2009d  \u2009\u2009e  " +
                 "\u2009\u2009f  \u2009\u2009g  \u2009\u2009h %s\n", EscapeSequences.EMPTY, EscapeSequences.EMPTY)
                 : String.format("%sh  \u2009g  \u2009\u2009f  \u2009\u2009e  \u2009\u2009d  \u2009\u2009c  " +
                 "\u2009\u2009b  \u2009\u2009a %s\n", EscapeSequences.EMPTY, EscapeSequences.EMPTY);
+
         drawBoard.append(letters);
 
+        // Adjust row iteration based on the perspective (white or black)
         int startRow = isWhitePerspective ? 8 : 1;
         int rowIncrement = isWhitePerspective ? -1 : 1;
 
         for (int i = 0; i < 8; i++) {
+            // Determine the actual row label depending on perspective
             int rowLabel = startRow + rowIncrement * i;
             drawBoard.append(rowLabel).append(" ");
 
-            for (int col = 0; col < 8; col++) {
-                String bgColor = ((i + col) % 2 == 0) ? EscapeSequences.SET_BG_COLOR_LIGHT_GREY : EscapeSequences.SET_BG_COLOR_DARK_GREY;
-                ChessPosition position = new ChessPosition(rowLabel, col + 1);
-                ChessPiece piece = board.getPiece(position);
-                String pieceSymbol = (piece != null) ? getPieceSymbol(piece) : EscapeSequences.EMPTY;
+            if(isWhitePerspective) {
+                for (int col = 0; col < 8; col++) {
+                    String bgColor = ((i + col) % 2 == 0) ? EscapeSequences.SET_BG_COLOR_LIGHT_GREY : EscapeSequences.SET_BG_COLOR_DARK_GREY;
+                    ChessPosition position = new ChessPosition(rowLabel, col + 1);
+                    ChessPiece piece = board.getPiece(position);
+                    String pieceSymbol = (piece != null) ? getPieceSymbol(piece) : EscapeSequences.EMPTY;
 
-                drawBoard.append(bgColor).append(pieceSymbol).append(EscapeSequences.RESET_BG_COLOR);
+                    drawBoard.append(bgColor).append(pieceSymbol).append(EscapeSequences.RESET_BG_COLOR);
+                }
+            } else {
+                for (int col = 8; col > 0; col--) {
+                    String bgColor = ((i + col) % 2 == 0) ? EscapeSequences.SET_BG_COLOR_LIGHT_GREY : EscapeSequences.SET_BG_COLOR_DARK_GREY;
+                    ChessPosition position = new ChessPosition(rowLabel, col);
+                    ChessPiece piece = board.getPiece(position);
+                    String pieceSymbol = (piece != null) ? getPieceSymbol(piece) : EscapeSequences.EMPTY;
+
+                    drawBoard.append(bgColor).append(pieceSymbol).append(EscapeSequences.RESET_BG_COLOR);
+                }
             }
 
             drawBoard.append(" ").append(rowLabel).append("\n");
