@@ -47,6 +47,13 @@ public class Server {
         Spark.awaitStop();
     }
 
+    private Object exceptionHandler(ServiceException ex, Response res) {
+        HashMap<String, String> errorMap = new HashMap<>();
+        errorMap.put("message", ex.getMessage());
+        res.status(ex.getStatusCode());
+        return new Gson().toJson(errorMap);
+    }
+
     private Object registerUser(Request req, Response res) throws DataAccessException, ServiceException {
         try {
             var newUser = new Gson().fromJson(req.body(), UserData.class);
@@ -54,10 +61,7 @@ public class Server {
             res.status(200);
             return new Gson().toJson(user);
         } catch (ServiceException ex) {
-            HashMap<String, String> errorMap = new HashMap<>();
-            errorMap.put("message", ex.getMessage());
-            res.status(ex.getStatusCode());
-            return new Gson().toJson(errorMap);
+            return exceptionHandler(ex, res);
         }
     }
 
@@ -67,10 +71,7 @@ public class Server {
             var authData = loginService.loginUser(loginReq.username(), loginReq.password());
             return new Gson().toJson(authData);
         } catch (ServiceException ex) {
-            HashMap<String, String> errorMap = new HashMap<>();
-            errorMap.put("message", ex.getMessage());
-            res.status(ex.getStatusCode());
-            return new Gson().toJson(errorMap);
+            return exceptionHandler(ex, res);
         }
     }
 
@@ -86,10 +87,7 @@ public class Server {
             logoutService.logoutUser(authToken);
             return "";
         } catch (ServiceException ex) {
-            HashMap<String, String> errorMap = new HashMap<>();
-            errorMap.put("message", ex.getMessage());
-            res.status(ex.getStatusCode());
-            return new Gson().toJson(errorMap);
+            return exceptionHandler(ex, res);
         }
     }
 
@@ -101,10 +99,7 @@ public class Server {
             HashMap<String, Integer> createGameResult = newGameService.createGame(authToken, gameName);
             return new Gson().toJson(createGameResult);
         } catch (ServiceException ex) {
-            HashMap<String, String> errorMap = new HashMap<>();
-            errorMap.put("message", ex.getMessage());
-            res.status(ex.getStatusCode());
-            return new Gson().toJson(errorMap);
+            return exceptionHandler(ex, res);
         }
     }
 
@@ -116,10 +111,7 @@ public class Server {
             games.put("games", gameList);
             return new Gson().toJson(games);
         } catch (ServiceException ex) {
-            HashMap<String, String> errorMap = new HashMap<>();
-            errorMap.put("message", ex.getMessage());
-            res.status(ex.getStatusCode());
-            return new Gson().toJson(errorMap);
+            return exceptionHandler(ex, res);
         }
     }
 
@@ -135,10 +127,7 @@ public class Server {
             joinGameService.joinGame(authToken, playerColor, gameID);
             return "";
         } catch (ServiceException ex) {
-            HashMap<String, String> errorMap = new HashMap<>();
-            errorMap.put("message", ex.getMessage());
-            res.status(ex.getStatusCode());
-            return new Gson().toJson(errorMap);
+            return exceptionHandler(ex, res);
         }
     }
 }
