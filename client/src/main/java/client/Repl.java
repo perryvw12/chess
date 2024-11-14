@@ -14,7 +14,7 @@ public class Repl {
 
     public void run() {
         System.out.printf("%s Welcome to Chess. Sign in to start %s%n", WHITE_KING, WHITE_KING);
-        System.out.print(client.preHelp());
+        System.out.print(SET_TEXT_COLOR_BLUE + client.preHelp());
 
         Scanner scanner = new Scanner(System.in);
         var result = "";
