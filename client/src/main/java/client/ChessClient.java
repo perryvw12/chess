@@ -7,7 +7,6 @@ import exception.ServiceException;
 import model.GameData;
 import model.UserData;
 import server.ServerFacade;
-import ui.BoardDrawer;
 
 import java.lang.reflect.Type;
 import java.util.ArrayList;
@@ -20,7 +19,7 @@ import static ui.BoardDrawer.drawBoardWhite;
 public class ChessClient {
     String authToken = null;
     ServerFacade server;
-    clientState state = clientState.LOGGEDOUT;
+    ClientState state = ClientState.LOGGEDOUT;
     HashMap<Integer, ChessGame> gameList = new HashMap<>();
 
 
@@ -33,9 +32,9 @@ public class ChessClient {
             var tokens = input.toLowerCase().split(" ");
             var cmd = (tokens.length > 0) ? tokens[0] : "help";
             var params = Arrays.copyOfRange(tokens, 1, tokens.length);
-            if(state == clientState.PLAYING) {
+            if(state == ClientState.PLAYING) {
                 return "";
-            } else if (state == clientState.LOGGEDIN) {
+            } else if (state == ClientState.LOGGEDIN) {
                 return switch (cmd) {
                     case "create" -> createGame(params);
                     case "list" -> listGames();
@@ -66,7 +65,7 @@ public class ChessClient {
             UserData newUser = new UserData(username, password, email);
             var authData = server.registerUser(newUser);
             authToken = authData.authToken();
-            state = clientState.LOGGEDIN;
+            state = ClientState.LOGGEDIN;
             return String.format("You are logged in as %s.%n%s", username, postHelp());
         }
         throw new ServiceException(400, "Expected: <USERNAME> <PASSWORD> <EMAIL>");
@@ -81,7 +80,7 @@ public class ChessClient {
             loginReq.put("password", password);
             var authData = server.loginUser(loginReq);
             authToken = authData.authToken();
-            state = clientState.LOGGEDIN;
+            state = ClientState.LOGGEDIN;
             return String.format("You are logged in as %s.%n%s", username, postHelp());
         }
         throw new ServiceException(400, "Expected: <USERNAME> <PASSWORD>");
@@ -137,7 +136,7 @@ public class ChessClient {
     public String logout() throws ServiceException {
         server.logout(authToken);
         authToken = null;
-        state = clientState.LOGGEDOUT;
+        state = ClientState.LOGGEDOUT;
         return String.format("You have logged out.%n%s", preHelp());
     }
 
@@ -162,7 +161,7 @@ public class ChessClient {
                 """;
     }
 
-    private enum clientState {
+    private enum ClientState {
         LOGGEDOUT,
         LOGGEDIN,
         PLAYING

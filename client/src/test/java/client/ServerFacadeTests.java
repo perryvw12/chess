@@ -14,11 +14,13 @@ import static org.junit.jupiter.api.Assertions.*;
 public class ServerFacadeTests {
 
     private static Server server;
+    static String url;
 
     @BeforeAll
     public static void init() {
         server = new Server();
-        var port = server.run(8080);
+        var port = server.run(0);
+        url = "http://localhost:" + port;
         System.out.println("Started test HTTP server on " + port);
     }
 
@@ -30,7 +32,7 @@ public class ServerFacadeTests {
 
     @Test
     public void goodRegister() throws ServiceException, DataAccessException {
-        ServerFacade serverFacade = new ServerFacade("http://localhost:8080");
+        ServerFacade serverFacade = new ServerFacade(url);
         serverFacade.clearAll();
         var testUser = new UserData("test", "test", "email");
         var authData = serverFacade.registerUser(testUser);
@@ -39,7 +41,7 @@ public class ServerFacadeTests {
 
     @Test
     public void badRegister() throws ServiceException, DataAccessException {
-        ServerFacade serverFacade = new ServerFacade("http://localhost:8080");
+        ServerFacade serverFacade = new ServerFacade(url);
         serverFacade.clearAll();
         var testUser = new UserData("test", "test", "email");
         serverFacade.registerUser(testUser);
@@ -50,7 +52,7 @@ public class ServerFacadeTests {
 
     @Test
     public void goodLogin() throws ServiceException {
-        ServerFacade serverFacade = new ServerFacade("http://localhost:8080");
+        ServerFacade serverFacade = new ServerFacade(url);
         serverFacade.clearAll();
         var testUser = new UserData("test", "test", "email");
         var expectedAuth = serverFacade.registerUser(testUser);
@@ -63,7 +65,7 @@ public class ServerFacadeTests {
 
     @Test
     public void badLogin() throws ServiceException {
-        ServerFacade serverFacade = new ServerFacade("http://localhost:8080");
+        ServerFacade serverFacade = new ServerFacade(url);
         serverFacade.clearAll();
         var testUser = new UserData("test", "test", "email");
         HashMap<String, String> loginReq = new HashMap<>();
@@ -75,7 +77,7 @@ public class ServerFacadeTests {
 
     @Test
     public void goodCreate() throws ServiceException {
-        ServerFacade serverFacade = new ServerFacade("http://localhost:8080");
+        ServerFacade serverFacade = new ServerFacade(url);
         ChessClient client = new ChessClient(serverFacade);
         serverFacade.clearAll();
         var testUser = new UserData("test", "test", "email");
@@ -90,7 +92,7 @@ public class ServerFacadeTests {
 
     @Test
     public void badCreate() throws ServiceException {
-        ServerFacade serverFacade = new ServerFacade("http://localhost:8080");
+        ServerFacade serverFacade = new ServerFacade(url);
         ChessClient client = new ChessClient(serverFacade);
         serverFacade.clearAll();
         var testUser = new UserData("test", "test", "email");
@@ -104,7 +106,7 @@ public class ServerFacadeTests {
 
     @Test
     public void goodLogout() throws ServiceException {
-        ServerFacade serverFacade = new ServerFacade("http://localhost:8080");
+        ServerFacade serverFacade = new ServerFacade(url);
         serverFacade.clearAll();
         var testUser = new UserData("test", "test", "email");
         var authData = serverFacade.registerUser(testUser);
@@ -115,7 +117,7 @@ public class ServerFacadeTests {
 
     @Test
     public void badLogout() throws ServiceException {
-        ServerFacade serverFacade = new ServerFacade("http://localhost:8080");
+        ServerFacade serverFacade = new ServerFacade(url);
         serverFacade.clearAll();
         var testUser = new UserData("test", "test", "email");
         serverFacade.registerUser(testUser);
@@ -125,7 +127,7 @@ public class ServerFacadeTests {
 
     @Test
     public void goodList() throws ServiceException {
-        ServerFacade serverFacade = new ServerFacade("http://localhost:8080");
+        ServerFacade serverFacade = new ServerFacade(url);
         serverFacade.clearAll();
         var testUser = new UserData("test", "test", "email");
         var authData = serverFacade.registerUser(testUser);
@@ -140,7 +142,7 @@ public class ServerFacadeTests {
 
     @Test
     public void badList() throws ServiceException {
-        ServerFacade serverFacade = new ServerFacade("http://localhost:8080");
+        ServerFacade serverFacade = new ServerFacade(url);
         serverFacade.clearAll();
         var testUser = new UserData("test", "test", "email");
         var authData = serverFacade.registerUser(testUser);
@@ -155,7 +157,7 @@ public class ServerFacadeTests {
 
     @Test
     public void goodJoin() throws ServiceException {
-        ServerFacade serverFacade = new ServerFacade("http://localhost:8080");
+        ServerFacade serverFacade = new ServerFacade(url);
         serverFacade.clearAll();
         var testUser = new UserData("test", "test", "email");
         var authData = serverFacade.registerUser(testUser);
@@ -169,7 +171,7 @@ public class ServerFacadeTests {
 
     @Test
     public void badJoin() throws ServiceException {
-        ServerFacade serverFacade = new ServerFacade("http://localhost:8080");
+        ServerFacade serverFacade = new ServerFacade(url);
         serverFacade.clearAll();
         var testUser = new UserData("test", "test", "email");
         var authData = serverFacade.registerUser(testUser);
