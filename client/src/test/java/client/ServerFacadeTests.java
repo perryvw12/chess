@@ -152,4 +152,33 @@ public class ServerFacadeTests {
         client.authToken = "badAuth";
         assertThrows(ServiceException.class, client::listGames);
     }
+
+    @Test
+    public void goodJoin() throws ServiceException {
+        ServerFacade serverFacade = new ServerFacade("http://localhost:8080");
+        serverFacade.clearAll();
+        var testUser = new UserData("test", "test", "email");
+        var authData = serverFacade.registerUser(testUser);
+        ChessClient client = new ChessClient(serverFacade);
+        client.authToken = authData.authToken();
+        client.createGame("game1");
+        client.listGames();
+        Integer gameID = (Integer) client.gameList.keySet().toArray()[0];
+        assertDoesNotThrow(() -> serverFacade.joinGame("WHITE", gameID.toString(), client.authToken));
+    }
+
+    @Test
+    public void badJoin() throws ServiceException {
+        ServerFacade serverFacade = new ServerFacade("http://localhost:8080");
+        serverFacade.clearAll();
+        var testUser = new UserData("test", "test", "email");
+        var authData = serverFacade.registerUser(testUser);
+        ChessClient client = new ChessClient(serverFacade);
+        client.authToken = authData.authToken();
+        client.createGame("game1");
+        client.listGames();
+        Integer gameID = (Integer) client.gameList.keySet().toArray()[0];
+        assertThrows(ServiceException.class, () ->
+                serverFacade.joinGame("WHITE", gameID.toString(), "badAuthToken"));
+    }
 }
