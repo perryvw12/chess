@@ -14,7 +14,8 @@ public class BoardDrawer {
     public static String drawBoardWhite(ChessGame game) {
         ChessBoard board = game.getBoard();
         StringBuilder drawBoard = new StringBuilder(EscapeSequences.ERASE_SCREEN);
-        String letters = String.format("%sa  \u2009b  \u2009\u2009c  \u2009\u2009d  \u2009\u2009e  \u2009\u2009f  \u2009\u2009g  \u2009\u2009h %s\n", EscapeSequences.EMPTY, EscapeSequences.EMPTY);
+        String letters = String.format("%sa  \u2009b  \u2009\u2009c  \u2009\u2009d  \u2009\u2009e" +
+                "  \u2009\u2009f  \u2009\u2009g  \u2009\u2009h %s\n", EscapeSequences.EMPTY, EscapeSequences.EMPTY);
         drawBoard.append(letters);
 
         for (int row = 0; row < 8; row++) {
@@ -63,7 +64,8 @@ public class BoardDrawer {
     public static String drawBoardBlack(ChessGame game) {
         ChessBoard board = game.getBoard();
         StringBuilder drawBoard = new StringBuilder(EscapeSequences.ERASE_SCREEN);
-        String letters = String.format("%sh  \u2009g  \u2009\u2009f  \u2009\u2009e  \u2009\u2009d  \u2009\u2009c  \u2009\u2009b  \u2009\u2009a %s\n", EscapeSequences.EMPTY, EscapeSequences.EMPTY);
+        String letters = String.format("%sh  \u2009g  \u2009\u2009f  \u2009\u2009e  \u2009\u2009d  " +
+                "\u2009\u2009c  \u2009\u2009b  \u2009\u2009a %s\n", EscapeSequences.EMPTY, EscapeSequences.EMPTY);
         drawBoard.append(letters);
 
         for (int row = 0; row < 8; row++) {

@@ -115,7 +115,8 @@ public class ChessClient {
         ArrayList<GameData> gameDataList = deserializedResults.get("games");
         StringBuilder finalResult = new StringBuilder();
         for (GameData gameData : gameDataList) {
-            finalResult.append(String.format("Game:%s, ID:%s, WhitePlayer:%s, BlackPlayer:%s%n", gameData.gameName(), gameData.gameID(), gameData.whiteUsername(), gameData.blackUsername()));
+            finalResult.append(String.format("Game:%s, ID:%s, WhitePlayer:%s, BlackPlayer:%s%n", gameData.gameName(),
+                    gameData.gameID(), gameData.whiteUsername(), gameData.blackUsername()));
             gameList.put(gameData.gameID(), gameData.chessGame());
         }
         return finalResult.toString();

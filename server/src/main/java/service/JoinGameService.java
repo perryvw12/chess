@@ -25,14 +25,16 @@ public class JoinGameService {
         }
         if(Objects.equals(playerColor, "WHITE")) {
             if(Objects.equals(gameData.whiteUsername(), null)) {
-                var updatedGameData = new GameData(gameData.gameID(), authData.username(), gameData.blackUsername(), gameData.gameName(), gameData.chessGame());
+                var updatedGameData = new GameData(gameData.gameID(), authData.username(), gameData.blackUsername(),
+                        gameData.gameName(), gameData.chessGame());
                 dataAccess.gameDataAccess.updateGame(gameID, updatedGameData);
             } else {
                 throw new ServiceException(403, "Error: already taken");
             }
         } else if(Objects.equals(playerColor, "BLACK")) {
             if(Objects.equals(gameData.blackUsername(), null)) {
-                var updatedGameData = new GameData(gameData.gameID(), gameData.whiteUsername(), authData.username(), gameData.gameName(), gameData.chessGame());
+                var updatedGameData = new GameData(gameData.gameID(), gameData.whiteUsername(), authData.username(),
+                        gameData.gameName(), gameData.chessGame());
                 dataAccess.gameDataAccess.updateGame(gameID, updatedGameData);
             } else {
                 throw new ServiceException(403, "Error: already taken");
