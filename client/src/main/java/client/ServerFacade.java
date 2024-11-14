@@ -12,6 +12,7 @@ import java.lang.reflect.Type;
 import java.net.*;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Objects;
 
 public class ServerFacade {
     String serverUrl;
@@ -76,6 +77,7 @@ public class ServerFacade {
             throwIfNotSuccessful(http);
             return readBody(http, responseClass);
         } catch (Exception ex) {
+
             throw new ServiceException(500, ex.getMessage());
         }
     }
@@ -93,7 +95,14 @@ public class ServerFacade {
     private void throwIfNotSuccessful(HttpURLConnection http) throws IOException, ServiceException {
         var status = http.getResponseCode();
         if((status / 100) != 2) {
-            throw new ServiceException(status, "failure: " + status);
+            var responseMessage = http.getResponseMessage();
+            if(Objects.equals(responseMessage, "Forbidden")) {
+                throw new ServiceException(status, "Username already taken");
+            } else if(Objects.equals(responseMessage, "Unauthorized")) {
+                throw new ServiceException(status, "Incorrect username or password.");
+            } else {
+                throw new ServiceException(status, responseMessage);
+            }
         }
     }
 

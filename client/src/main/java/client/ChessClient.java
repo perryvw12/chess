@@ -52,9 +52,6 @@ public class ChessClient {
                 };
             }
         } catch (ServiceException ex) {
-            if(ex.getStatusCode()==500) {
-                return "Bad username or password.";
-            }
             return ex.getMessage();
         }
     }
@@ -119,8 +116,9 @@ public class ChessClient {
         StringBuilder finalResult = new StringBuilder();
         int IdCounter = 1;
         for (GameData gameData : gameDataList) {
-            finalResult.append(String.format("Game:%s, ID:%s, WhitePlayer:%s, BlackPlayer:%s%n", gameData.gameName(),
-                    IdCounter, gameData.whiteUsername(), gameData.blackUsername()));
+            finalResult.append(String.format("#%s Name:%s, WhitePlayer:%s, BlackPlayer:%s%n", IdCounter, gameData.gameName(),
+                    gameData.whiteUsername() != null ? gameData.whiteUsername() : "[open]",
+                    gameData.blackUsername() != null ? gameData.blackUsername() : "[open]"));
             gameList.put(IdCounter++, gameData);
         }
         return finalResult.toString();
@@ -128,18 +126,25 @@ public class ChessClient {
 
     public String joinGame(String... params) throws ServiceException {
         if(params.length >= 2) {
-            int gameID;
             try {
-                gameID = Integer.parseInt(params[0]);
-            } catch (NumberFormatException e) {
-                throw new ServiceException(400, "Invalid game ID. Please provide a valid number.");
+                var gameID = Integer.parseInt(params[0]);
+                var gameData = gameList.get(gameID);
+                boolean whiteEmpty = gameData.whiteUsername()==null;
+                boolean blackEmpty = gameData.blackUsername()==null;
+                var playerColor = params[1].toUpperCase();
+                if(!playerColor.equals("WHITE") & !playerColor.equals("BLACK")) {
+                    return "Invalid option. Please pick white or black.";
+                }
+                if((playerColor.equals("BLACK") & !blackEmpty) | (playerColor.equals("WHITE") & !whiteEmpty)) {
+                    return "Color is already taken";
+                }
+                server.joinGame(playerColor, Integer.toString(gameData.gameID()), authToken);
+             return String.format("%s%n%s", drawBoardWhite(gameData.chessGame()), drawBoardBlack(gameData.chessGame()));
+            } catch (Exception e) {
+                throw new ServiceException(400, "Invalid game number. Please provide a valid number.");
             }
-            var playerColor = params[1].toUpperCase();
-            var gameData = gameList.get(gameID);
-            server.joinGame(playerColor, Integer.toString(gameData.gameID()), authToken);
-            return String.format("%s%n%s", drawBoardWhite(gameData.chessGame()), drawBoardBlack(gameData.chessGame()));
         }
-        throw new ServiceException(400, "Expected: <ID> [WHITE|BLACK]");
+        throw new ServiceException(400, "Expected: <GameNumber> [WHITE|BLACK]");
     }
 
     public String logout() throws ServiceException {
@@ -154,21 +159,21 @@ public class ChessClient {
             int gameID;
             try {
                 gameID = Integer.parseInt(params[0]);
+                ChessGame game = (gameList.get(gameID)).chessGame();
+                return String.format("%s%n%s", drawBoardWhite(game), drawBoardBlack(game));
             } catch (NumberFormatException e) {
-                throw new ServiceException(400, "Invalid game ID. Please provide a valid number.");
+                throw new ServiceException(400, "Invalid game number. Please provide a valid number.");
             }
-            ChessGame game = (gameList.get(gameID)).chessGame();
-            return String.format("%s%n%s", drawBoardWhite(game), drawBoardBlack(game));
         }
-        throw new ServiceException(400,"Expected: <ID>");
+        throw new ServiceException(400,"Expected: <GameNumber>");
     }
 
     public String postHelp() {
         return """
                 - create <NAME> - creates a game
                 - list - games
-                - join <ID> [WHITE|BLACK] - a game
-                - observe <ID> - a game
+                - join <GameNumber> [WHITE|BLACK] - a game
+                - observe <GameNumber> - a game
                 - logout - when you are done
                 - quit
                 - help
