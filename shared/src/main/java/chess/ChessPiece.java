@@ -131,17 +131,17 @@ public class ChessPiece {
 
             if (pieceAtPos != null) {
                 if (pieceAtPos.getTeamColor() != pieceColor) {
-                    if (newPos.getRow() == 8 || newPos.getRow() == 1) {
-                        for (PieceType pieces : PieceType.values()) {
-                            if (pieces == PieceType.KING || pieces == PieceType.PAWN) {
-                                continue;
-                            } else {
-                                moves.add(new ChessMove(myPosition, newPos, pieces));
-                            }
-                        }
-                    } else {
-                        moves.add(new ChessMove(myPosition, newPos, null));
-                    }
+                if (newPos.getRow() == 8 || newPos.getRow() == 1) {
+                for (PieceType pieces : PieceType.values()) {
+                if (pieces == PieceType.KING || pieces == PieceType.PAWN) {
+                continue;
+                } else {
+                moves.add(new ChessMove(myPosition, newPos, pieces));
+                }
+                }
+                } else {
+                moves.add(new ChessMove(myPosition, newPos, null));
+                }
                 }
             }
         }
