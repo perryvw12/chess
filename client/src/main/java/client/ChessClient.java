@@ -125,9 +125,14 @@ public class ChessClient {
 
     public String joinGame(String... params) throws ServiceException {
         if(params.length >= 2) {
-            var gameID = params[0];
+            int gameID;
+            try {
+                gameID = Integer.parseInt(params[0]);
+            } catch (NumberFormatException e) {
+                throw new ServiceException(400, "Invalid game ID. Please provide a valid number.");
+            }
             var playerColor = params[1].toUpperCase();
-            var gameData = gameList.get(Integer.parseInt(gameID));
+            var gameData = gameList.get(gameID);
             server.joinGame(playerColor, Integer.toString(gameData.gameID()), authToken);
             return String.format("%s%n%s", drawBoardWhite(gameData.chessGame()), drawBoardBlack(gameData.chessGame()));
         }
@@ -143,8 +148,13 @@ public class ChessClient {
 
     public String observeGame(String... params) throws ServiceException {
         if(params.length >= 1) {
-            var gameID = params[0];
-            ChessGame game = (gameList.get(Integer.parseInt(gameID))).chessGame();
+            int gameID;
+            try {
+                gameID = Integer.parseInt(params[0]);
+            } catch (NumberFormatException e) {
+                throw new ServiceException(400, "Invalid game ID. Please provide a valid number.");
+            }
+            ChessGame game = (gameList.get(gameID)).chessGame();
             return String.format("%s%n%s", drawBoardWhite(game), drawBoardBlack(game));
         }
         throw new ServiceException(400,"Expected: <ID>");
