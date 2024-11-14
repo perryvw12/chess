@@ -13,8 +13,10 @@ public class BoardDrawer {
         ChessBoard board = game.getBoard();
         StringBuilder drawBoard = new StringBuilder(EscapeSequences.ERASE_SCREEN);
         String letters = isWhitePerspective
-                ? String.format("%sa  \u2009b  \u2009\u2009c  \u2009\u2009d  \u2009\u2009e  \u2009\u2009f  \u2009\u2009g  \u2009\u2009h %s\n", EscapeSequences.EMPTY, EscapeSequences.EMPTY)
-                : String.format("%sh  \u2009g  \u2009\u2009f  \u2009\u2009e  \u2009\u2009d  \u2009\u2009c  \u2009\u2009b  \u2009\u2009a %s\n", EscapeSequences.EMPTY, EscapeSequences.EMPTY);
+                ? String.format("%sa  \u2009b  \u2009\u2009c  \u2009\u2009d  \u2009\u2009e  " +
+                "\u2009\u2009f  \u2009\u2009g  \u2009\u2009h %s\n", EscapeSequences.EMPTY, EscapeSequences.EMPTY)
+                : String.format("%sh  \u2009g  \u2009\u2009f  \u2009\u2009e  \u2009\u2009d  \u2009\u2009c  " +
+                "\u2009\u2009b  \u2009\u2009a %s\n", EscapeSequences.EMPTY, EscapeSequences.EMPTY);
         drawBoard.append(letters);
 
         int startRow = isWhitePerspective ? 8 : 1;
