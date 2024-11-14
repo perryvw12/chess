@@ -114,10 +114,11 @@ public class ChessClient {
         HashMap<String, ArrayList<GameData>> deserializedResults = new Gson().fromJson(String.valueOf(results), type);
         ArrayList<GameData> gameDataList = deserializedResults.get("games");
         StringBuilder finalResult = new StringBuilder();
+        int IdCounter = 1;
         for (GameData gameData : gameDataList) {
             finalResult.append(String.format("Game:%s, ID:%s, WhitePlayer:%s, BlackPlayer:%s%n", gameData.gameName(),
-                    gameData.gameID(), gameData.whiteUsername(), gameData.blackUsername()));
-            gameList.put(gameData.gameID(), gameData.chessGame());
+                    IdCounter, gameData.whiteUsername(), gameData.blackUsername()));
+            gameList.put(IdCounter++, gameData.chessGame());
         }
         return finalResult.toString();
     }
