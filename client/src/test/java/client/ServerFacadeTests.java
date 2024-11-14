@@ -9,8 +9,7 @@ import server.ServerFacade;
 
 import java.util.HashMap;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.*;
 
 public class ServerFacadeTests {
 
@@ -74,5 +73,32 @@ public class ServerFacadeTests {
                 serverFacade.loginUser(loginReq));
     }
 
+    @Test
+    public void goodCreate() throws ServiceException {
+        ServerFacade serverFacade = new ServerFacade("http://localhost:8080");
+        ChessClient client = new ChessClient(serverFacade);
+        serverFacade.clearAll();
+        var testUser = new UserData("test", "test", "email");
+        var authData = serverFacade.registerUser(testUser);
+        HashMap<String, String> createReq = new HashMap<>();
+        createReq.put("authorization", authData.authToken());
+        createReq.put("gameName", "testGame");
+        serverFacade.createGame(createReq);
+        client.authToken = authData.authToken();
+        assertNotNull(client.listGames());
+    }
 
+    @Test
+    public void badCreate() throws ServiceException {
+        ServerFacade serverFacade = new ServerFacade("http://localhost:8080");
+        ChessClient client = new ChessClient(serverFacade);
+        serverFacade.clearAll();
+        var testUser = new UserData("test", "test", "email");
+        var authData = serverFacade.registerUser(testUser);
+        HashMap<String, String> createReq = new HashMap<>();
+        createReq.put("authorization", "badAUth");
+        createReq.put("gameName", "testGame");
+        assertThrows(ServiceException.class, () ->
+                serverFacade.createGame(createReq));
+    }
 }
