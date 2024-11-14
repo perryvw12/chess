@@ -169,24 +169,10 @@ public class ChessGame {
      * @return True if the specified team is in checkmate
      */
     public boolean isInCheckmate(TeamColor teamColor) {
-        var board = getBoard();
-        Collection<ChessMove> valid = new ArrayList<>();
-        if(isInCheck(teamColor)) {
-            for (int row = 1; row <= 8; row++) {
-                for (int col = 1; col <= 8; col++) {
-                    ChessPosition location = new ChessPosition(row, col);
-                    ChessPiece piece = board.getPiece(location);
-                    if(piece != null) {
-                        if(piece.getTeamColor() == teamColor) {
-                            valid.addAll(validMoves(location));
-                        }
-                    }
-                }
-            }
-            return valid.isEmpty();
-        } else {
-            return false;
+        if (isInCheck(teamColor)) {
+            return getValidTeamMoves(teamColor).isEmpty();
         }
+        return false;
     }
 
     /**
@@ -197,25 +183,28 @@ public class ChessGame {
      * @return True if the specified team is in stalemate, otherwise false
      */
     public boolean isInStalemate(TeamColor teamColor) {
-        var board = getBoard();
-        Collection<ChessMove> valid = new ArrayList<>();
-        if(!isInCheck(teamColor)) {
+        if (!isInCheck(teamColor)) {
+            return getValidTeamMoves(teamColor).isEmpty();
+        }
+        return false;
+    }
+
+        private Collection<ChessMove> getValidTeamMoves(TeamColor teamColor) {
+            var board = getBoard();
+            Collection<ChessMove> validMoves = new ArrayList<>();
+
             for (int row = 1; row <= 8; row++) {
                 for (int col = 1; col <= 8; col++) {
                     ChessPosition location = new ChessPosition(row, col);
                     ChessPiece piece = board.getPiece(location);
-                    if(piece != null) {
-                        if(piece.getTeamColor() == teamColor) {
-                            valid.addAll(validMoves(location));
-                        }
+                    if (piece != null && piece.getTeamColor() == teamColor) {
+                        validMoves.addAll(validMoves(location));
                     }
                 }
             }
-            return valid.isEmpty();
-        } else {
-            return false;
+
+            return validMoves;
         }
-    }
 
     /**
      * Sets this game's chessboard with a given board
