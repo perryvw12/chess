@@ -101,4 +101,25 @@ public class ServerFacadeTests {
         assertThrows(ServiceException.class, () ->
                 serverFacade.createGame(createReq));
     }
+
+    @Test
+    public void goodLogout() throws ServiceException {
+        ServerFacade serverFacade = new ServerFacade("http://localhost:8080");
+        serverFacade.clearAll();
+        var testUser = new UserData("test", "test", "email");
+        var authData = serverFacade.registerUser(testUser);
+        serverFacade.logout(authData.authToken());
+        assertThrows(ServiceException.class, () ->
+                serverFacade.logout(authData.authToken()));
+    }
+
+    @Test
+    public void badLogout() throws ServiceException {
+        ServerFacade serverFacade = new ServerFacade("http://localhost:8080");
+        serverFacade.clearAll();
+        var testUser = new UserData("test", "test", "email");
+        serverFacade.registerUser(testUser);
+        assertThrows(ServiceException.class, () ->
+                serverFacade.logout("badAuthToken"));
+    }
 }
