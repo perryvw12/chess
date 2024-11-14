@@ -46,13 +46,26 @@ public class ChessPiece {
         int col = myPosition.getColumn();
 
         if (!repetitive) {
-            addSingleMove(board, myPosition, row + rowMove, col + colMove, moves);
+            row += rowMove;
+            col += colMove;
+
+            if (row < 1 || row > 8 || col < 1 || col > 8) {
+                return;
+            }
+
+            ChessPosition newPosition = new ChessPosition(row, col);
+            ChessPiece pieceAtNewPosition = board.getPiece(newPosition);
+
+            if (pieceAtNewPosition == null || pieceAtNewPosition.getTeamColor() != pieceColor) {
+                moves.add(new ChessMove(myPosition, newPosition, null));
+            }
+
         } else {
             while (true) {
                 row += rowMove;
                 col += colMove;
 
-                if (isOutOfBounds(row, col)) {
+                if (row < 1 || row > 8 || col < 1 || col > 8) {
                     break;
                 }
 
@@ -69,23 +82,6 @@ public class ChessPiece {
                 }
             }
         }
-    }
-
-    private void addSingleMove(ChessBoard board, ChessPosition myPosition, int row, int col, Collection<ChessMove> moves) {
-        if (isOutOfBounds(row, col)) {
-            return;
-        }
-
-        ChessPosition newPosition = new ChessPosition(row, col);
-        ChessPiece pieceAtNewPosition = board.getPiece(newPosition);
-
-        if (pieceAtNewPosition == null || pieceAtNewPosition.getTeamColor() != pieceColor) {
-            moves.add(new ChessMove(myPosition, newPosition, null));
-        }
-    }
-
-    private boolean isOutOfBounds(int row, int col) {
-        return row < 1 || row > 8 || col < 1 || col > 8;
     }
 
     private void pawnMover(ChessBoard board, ChessPosition myPosition, int direction, Collection<ChessMove> moves) {
