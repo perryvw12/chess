@@ -122,4 +122,34 @@ public class ServerFacadeTests {
         assertThrows(ServiceException.class, () ->
                 serverFacade.logout("badAuthToken"));
     }
+
+    @Test
+    public void goodList() throws ServiceException {
+        ServerFacade serverFacade = new ServerFacade("http://localhost:8080");
+        serverFacade.clearAll();
+        var testUser = new UserData("test", "test", "email");
+        var authData = serverFacade.registerUser(testUser);
+        ChessClient client = new ChessClient(serverFacade);
+        client.authToken = authData.authToken();
+        assertEquals(client.listGames(), client.listGames());
+        client.createGame("game1");
+        client.createGame("game2");
+        client.createGame("game3");
+        assertEquals(client.listGames(), client.listGames());
+    }
+
+    @Test
+    public void badList() throws ServiceException {
+        ServerFacade serverFacade = new ServerFacade("http://localhost:8080");
+        serverFacade.clearAll();
+        var testUser = new UserData("test", "test", "email");
+        var authData = serverFacade.registerUser(testUser);
+        ChessClient client = new ChessClient(serverFacade);
+        client.authToken = authData.authToken();
+        client.createGame("game1");
+        client.createGame("game2");
+        client.createGame("game3");
+        client.authToken = "badAuth";
+        assertThrows(ServiceException.class, client::listGames);
+    }
 }
