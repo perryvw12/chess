@@ -52,6 +52,9 @@ public class ChessClient {
                 };
             }
         } catch (ServiceException ex) {
+            if(ex.getStatusCode()==500) {
+                return "Incorrect username or password.";
+            }
             return ex.getMessage();
         }
     }
