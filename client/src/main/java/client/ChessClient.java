@@ -6,7 +6,6 @@ import com.google.gson.reflect.TypeToken;
 import exception.ServiceException;
 import model.GameData;
 import model.UserData;
-import server.ServerFacade;
 
 import java.lang.reflect.Type;
 import java.util.ArrayList;

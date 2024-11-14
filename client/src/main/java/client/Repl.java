@@ -1,6 +1,5 @@
 package client;
 
-import server.ServerFacade;
 import java.util.Scanner;
 import static ui.EscapeSequences.*;
 
