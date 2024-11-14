@@ -7,7 +7,10 @@ import org.junit.jupiter.api.*;
 import server.Server;
 import server.ServerFacade;
 
+import java.util.HashMap;
+
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 public class ServerFacadeTests {
 
@@ -34,5 +37,42 @@ public class ServerFacadeTests {
         var authData = serverFacade.registerUser(testUser);
         assertEquals(testUser.username(), authData.username());
     }
+
+    @Test
+    public void badRegister() throws ServiceException, DataAccessException {
+        ServerFacade serverFacade = new ServerFacade("http://localhost:8080");
+        serverFacade.clearAll();
+        var testUser = new UserData("test", "test", "email");
+        serverFacade.registerUser(testUser);
+        var badUser = new UserData("test", "test", "badTest");
+        assertThrows(ServiceException.class, () ->
+                serverFacade.registerUser(badUser));
+    }
+
+    @Test
+    public void goodLogin() throws ServiceException {
+        ServerFacade serverFacade = new ServerFacade("http://localhost:8080");
+        serverFacade.clearAll();
+        var testUser = new UserData("test", "test", "email");
+        var expectedAuth = serverFacade.registerUser(testUser);
+        HashMap<String, String> loginReq = new HashMap<>();
+        loginReq.put("username", testUser.username());
+        loginReq.put("password", testUser.password());
+        var observedAuth = serverFacade.loginUser(loginReq);
+        assertEquals(observedAuth.username(), expectedAuth.username());
+    }
+
+    @Test
+    public void badLogin() throws ServiceException {
+        ServerFacade serverFacade = new ServerFacade("http://localhost:8080");
+        serverFacade.clearAll();
+        var testUser = new UserData("test", "test", "email");
+        HashMap<String, String> loginReq = new HashMap<>();
+        loginReq.put("username", testUser.username());
+        loginReq.put("password", testUser.password());
+        assertThrows(ServiceException.class, () ->
+                serverFacade.loginUser(loginReq));
+    }
+
 
 }
