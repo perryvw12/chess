@@ -7,6 +7,7 @@ import com.google.gson.reflect.TypeToken;
 import exception.ServiceException;
 import model.GameData;
 import model.UserData;
+import websocket.messages.NotificationMessage;
 import websocket.messages.ServerMessage;
 
 import java.lang.reflect.Type;
@@ -185,9 +186,7 @@ public class ChessClient implements ServerMessageObserver {
     @Override
     public void notify(ServerMessage serverMessage) {
         switch (serverMessage.getServerMessageType()) {
-            case NOTIFICATION -> displayNotification();
-            case ERROR -> displayError();
-            case LOAD_GAME -> loadGame();
+            return;
         }
     }
 
