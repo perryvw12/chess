@@ -1,11 +1,13 @@
 package client;
 
 import chess.ChessGame;
+import client.websocket.ServerMessageObserver;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 import exception.ServiceException;
 import model.GameData;
 import model.UserData;
+import websocket.messages.ServerMessage;
 
 import java.lang.reflect.Type;
 import java.util.ArrayList;
@@ -15,7 +17,7 @@ import java.util.HashMap;
 import static ui.BoardDrawer.drawBoardBlack;
 import static ui.BoardDrawer.drawBoardWhite;
 
-public class ChessClient {
+public class ChessClient implements ServerMessageObserver {
     String authToken = null;
     ServerFacade server;
     ClientState state = ClientState.LOGGEDOUT;
@@ -178,6 +180,15 @@ public class ChessClient {
                 - quit
                 - help
                 """;
+    }
+
+    @Override
+    public void notify(ServerMessage serverMessage) {
+        switch (serverMessage.getServerMessageType()) {
+            case NOTIFICATION -> displayNotification();
+            case ERROR -> displayError();
+            case LOAD_GAME -> loadGame();
+        }
     }
 
     private enum ClientState {
