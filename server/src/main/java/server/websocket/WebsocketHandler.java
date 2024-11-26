@@ -22,7 +22,7 @@ public class WebsocketHandler {
            UserGameCommand command = new Gson().fromJson(message, UserGameCommand.class);
 
            String username = (dataAccess.authDataAccess.getAuth(command.getAuthToken()).username());
-           saveSession(command.getGameID(), session);
+
 
            switch (command.getCommandType()) {
                case CONNECT -> connect();
