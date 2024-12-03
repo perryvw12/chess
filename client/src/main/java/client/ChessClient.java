@@ -35,7 +35,14 @@ public class ChessClient implements ServerMessageObserver {
             var cmd = (tokens.length > 0) ? tokens[0] : "help";
             var params = Arrays.copyOfRange(tokens, 1, tokens.length);
             if(state == ClientState.PLAYING) {
-                return "";
+                return switch (cmd) {
+                    case "redraw" -> redrawBoard();
+                    case "leave" -> leaveGame();
+                    case "move" -> movePiece();
+                    case "highlight" -> highlightMoves();
+                    case "resign" -> resign();
+                    default -> playingHelp();
+                };
             } else if (state == ClientState.LOGGEDIN) {
                 return switch (cmd) {
                     case "create" -> createGame(params);
