@@ -23,6 +23,8 @@ public class ChessClient implements ServerMessageObserver {
     ServerFacade server;
     ClientState state = ClientState.LOGGEDOUT;
     ChessGame.TeamColor playerColor = null;
+    Integer currentGameID = null;
+    ChessGame currentGame = null;
     HashMap<Integer, GameData> gameList = new HashMap<>();
 
 
@@ -150,7 +152,15 @@ public class ChessClient implements ServerMessageObserver {
                     return "Color is already taken";
                 }
                 server.joinGame(playerColor, Integer.toString(gameData.gameID()), authToken);
-             return String.format("%s%n%s", drawBoardWhite(gameData.chessGame()), drawBoardBlack(gameData.chessGame()));
+                this.playerColor = playerColor.equals("WHITE") ? ChessGame.TeamColor.WHITE : ChessGame.TeamColor.BLACK;
+                currentGameID = gameID;
+                currentGame = gameData.chessGame();
+                state = ClientState.PLAYING;
+                if(this.playerColor == ChessGame.TeamColor.WHITE) {
+                    return String.format("%s%n", drawBoardWhite(currentGame));
+                } else {
+                    return String.format("%s%n", drawBoardBlack(currentGame));
+                }
             } catch (Exception e) {
                 throw new ServiceException(400, "Invalid game number. Please provide a valid number.");
             }
