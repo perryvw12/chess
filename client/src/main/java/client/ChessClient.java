@@ -26,7 +26,7 @@ import java.util.HashMap;
 
 import static ui.BoardDrawer.drawBoardBlack;
 import static ui.BoardDrawer.drawBoardWhite;
-import static ui.EscapeSequences.SET_TEXT_COLOR_BLUE;
+import static ui.EscapeSequences.*;
 
 public class ChessClient implements ServerMessageObserver {
     String authToken = null;
@@ -292,7 +292,7 @@ public class ChessClient implements ServerMessageObserver {
         switch (messageType) {
             case "NOTIFICATION":
                 var notification = new Gson().fromJson(message, NotificationMessage.class);
-                System.out.printf("%s%n", notification.getMessage());
+                System.out.printf("%s%s%n", SET_TEXT_COLOR_GREEN, notification.getMessage());
                 break;
 
             case "LOAD_GAME":
@@ -300,10 +300,10 @@ public class ChessClient implements ServerMessageObserver {
                 currentGame = loadGameMessage.getGame();
                 if (playerColor == ChessGame.TeamColor.BLACK) {
                     System.out.printf("%n%s%s%n", SET_TEXT_COLOR_BLUE, drawBoardBlack(currentGame, null));
-                    System.out.println(playingHelp());
+                    System.out.print(SET_TEXT_COLOR_LIGHT_GREY + ">>>");
                 } else {
                     System.out.printf("%n%s%s%n", SET_TEXT_COLOR_BLUE, drawBoardWhite(currentGame, null));
-                    System.out.println(playingHelp());
+                    System.out.print(SET_TEXT_COLOR_LIGHT_GREY + ">>>");
                 }
                 break;
 

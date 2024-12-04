@@ -42,10 +42,10 @@ public class WebsocketHandler {
            switch (commandType) {
                case "CONNECT" -> connect(username, session, gameID);
                case "MAKE_MOVE" -> makeMove(message, username, gameID);
-               case "LEAVE" -> leave(username, gameID);
+               case "LEAVE" -> leave(message, username, gameID);
                case "RESIGN" -> resign();
            }
-       } catch (ServiceException | DataAccessException | IOException e) {
+       } catch (ServiceException | DataAccessException | IOException | InvalidMoveException e) {
            throw new ServiceException(500, e.getMessage());
        }
     }
@@ -55,31 +55,43 @@ public class WebsocketHandler {
 
         ChessGame game = (dataAccess.gameDataAccess.getGame(gameID)).chessGame();
         var loadGameMessage = new LoadGameMessage(ServerMessage.ServerMessageType.LOAD_GAME, game);
-        connections.broadcast(null, gameID, loadGameMessage);
+        connections.broadcastSelf(username, loadGameMessage);
 
         var message = String.format("%s has joined the game", username);
         var notification = new NotificationMessage(ServerMessage.ServerMessageType.NOTIFICATION, message);
         connections.broadcast(username, gameID, notification);
     }
 
-    private void makeMove(String message, String username, Integer gameID) throws ServiceException, DataAccessException, IOException {
+    private void makeMove(String message, String username, Integer gameID) throws ServiceException, DataAccessException, IOException, InvalidMoveException {
         var command = new Gson().fromJson(message, MakeMoveCommand.class);
         ChessMove chessMove = command.getChessMove();
         GameData gameData = dataAccess.gameDataAccess.getGame(gameID);
         ChessGame game = gameData.chessGame();
+        var playerColor = command.getPlayerColor();
+
+        if (game.isInCheckmate(ChessGame.TeamColor.WHITE) | game.isInCheckmate(ChessGame.TeamColor.BLACK)) {
+            var errorMessage = new ErrorMessage(ServerMessage.ServerMessageType.ERROR, "Game is over no moves can be made");
+            connections.broadcastSelf(username, errorMessage);
+        }
+
+        if(!playerColor.equals(game.getTeamTurn())) {
+            var errorMessage = new ErrorMessage(ServerMessage.ServerMessageType.ERROR, "Not your turn");
+            connections.broadcastSelf(username, errorMessage);
+        }
 
         var validMoves = game.validMoves(chessMove.getStartPosition());
         if (!validMoves.contains(chessMove)) {
             var errorMessage = new ErrorMessage(ServerMessage.ServerMessageType.ERROR, "Invalid Move");
-            connections.broadcast();
+            connections.broadcastSelf(username, errorMessage);
         } else {
-            GameData updatedGame = new GameData(gameID, gameData.whiteUsername(), gameData.blackUsername(), gameData.gameName(), game);
-            dataAccess.gameDataAccess.updateGame(gameID, updatedGame);
+            game.makeMove(chessMove);
+            GameData updatedGameData = new GameData(gameID, gameData.whiteUsername(), gameData.blackUsername(), gameData.gameName(), game);
+            dataAccess.gameDataAccess.updateGame(gameID, updatedGameData);
 
             var loadGameMessage = new LoadGameMessage(ServerMessage.ServerMessageType.LOAD_GAME, game);
             connections.broadcast(null, gameID, loadGameMessage);
 
-            var moveMessage = String.format("piece was moved from %s to %s", chessMove.getStartPosition(), chessMove.getEndPosition());
+            var moveMessage = String.format("%s has made a move", username);
             var moveNotification = new NotificationMessage(ServerMessage.ServerMessageType.NOTIFICATION, moveMessage);
             connections.broadcast(username, gameID, moveNotification);
 
@@ -101,7 +113,9 @@ public class WebsocketHandler {
         }
     }
 
-    private void leave(String username, Integer gameID, ChessGame.TeamColor playerColor) throws IOException, ServiceException, DataAccessException {
+    private void leave(String message, String username, Integer gameID) throws IOException, ServiceException, DataAccessException {
+        var leaveCommand = new Gson().fromJson(message, UserGameCommand.class);
+        var playerColor = leaveCommand.getPlayerColor();
         connections.deleteSession(username);
 
         GameData gameData = dataAccess.gameDataAccess.getGame(gameID);
@@ -113,8 +127,8 @@ public class WebsocketHandler {
             dataAccess.gameDataAccess.updateGame(gameID, updatedGame);
         }
 
-        var message = String.format("%s has left the game", username);
-        var notification = new NotificationMessage(ServerMessage.ServerMessageType.NOTIFICATION, message);
+        var notificationMessage = String.format("%s has left the game", username);
+        var notification = new NotificationMessage(ServerMessage.ServerMessageType.NOTIFICATION, notificationMessage);
         connections.broadcast(username, gameID, notification);
     }
 
