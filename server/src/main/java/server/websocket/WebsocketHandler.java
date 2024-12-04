@@ -68,7 +68,7 @@ public class WebsocketHandler {
         ChessGame game = gameData.chessGame();
         var playerColor = command.getPlayerColor();
 
-        if (game.isInCheckmate(ChessGame.TeamColor.WHITE) | game.isInCheckmate(ChessGame.TeamColor.BLACK)) {
+        if (!game.isGameInProgress()) {
             var errorMessage = new ErrorMessage(ServerMessage.ServerMessageType.ERROR, "Game is over no moves can be made");
             connections.broadcastSelf(username, errorMessage);
         }
