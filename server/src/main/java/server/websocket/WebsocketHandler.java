@@ -28,7 +28,7 @@ public class WebsocketHandler {
     public WebsocketHandler(DataAccess dataAccess) {this.dataAccess = dataAccess;}
 
     @OnWebSocketMessage
-    public void onMessage(Session session, String message) {
+    public void onMessage(Session session, String message) throws ServiceException {
        try {
            UserGameCommand command = new Gson().fromJson(message, UserGameCommand.class);
            String username = (dataAccess.authDataAccess.getAuth(command.getAuthToken()).username());
@@ -41,7 +41,7 @@ public class WebsocketHandler {
                case RESIGN -> resign();
            }
        } catch (ServiceException | DataAccessException | IOException e) {
-           throw new RuntimeException(e);
+           throw new ServiceException(500, e.getMessage());
        }
     }
 

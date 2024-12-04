@@ -159,7 +159,7 @@ public class ChessClient implements ServerMessageObserver {
                 }
                 server.joinGame(playerColor, Integer.toString(gameData.gameID()), authToken);
                 this.playerColor = playerColor.equals("WHITE") ? ChessGame.TeamColor.WHITE : ChessGame.TeamColor.BLACK;
-                currentGameID = gameID;
+                currentGameID = gameData.gameID();
                 currentGame = gameData.chessGame();
                 state = ClientState.PLAYING;
                 ws = new WebSocketCommunicator(server.serverUrl, this);
@@ -230,7 +230,7 @@ public class ChessClient implements ServerMessageObserver {
                 String coordinates = params[0];
                 char column = Character.toLowerCase(coordinates.charAt(0));
                 int colNum = column - 'a' + 1;
-                int rowNum = Character.getNumericValue(coordinates.charAt(1));
+                int rowNum = Integer.parseInt(coordinates.substring(1));
                 ChessPosition chessPosition = new ChessPosition(rowNum, colNum);
                 return playerColor == ChessGame.TeamColor.BLACK ? drawBoardBlack(currentGame, chessPosition) : drawBoardWhite(currentGame, chessPosition);
             } catch (Exception e) {

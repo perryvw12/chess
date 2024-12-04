@@ -2,13 +2,19 @@ package ui;
 
 import chess.*;
 
+import java.util.Collection;
+
 public class BoardDrawer {
 
     public BoardDrawer() {}
 
     public static String drawBoard(ChessGame game, ChessPosition chessPosition, boolean isWhitePerspective) {
         ChessBoard board = game.getBoard();
-        var validMoves = game.validMoves(chessPosition);
+        Collection<ChessMove> validMoves = null;
+        if(chessPosition != null) {
+            validMoves = game.validMoves(chessPosition);
+        }
+
         StringBuilder drawBoard = new StringBuilder(EscapeSequences.ERASE_SCREEN);
 
         String letters = isWhitePerspective
@@ -30,10 +36,15 @@ public class BoardDrawer {
                 for (int col = 0; col < 8; col++) {
                     String bgColor = ((i + col) % 2 == 0) ? EscapeSequences.SET_BG_COLOR_LIGHT_GREY : EscapeSequences.SET_BG_COLOR_DARK_GREY;
                     ChessPosition position = new ChessPosition(rowLabel, col + 1);
-                    for (ChessMove move : validMoves) {
-                        if (position == move.getEndPosition()) {
-                            bgColor = EscapeSequences.SET_BG_COLOR_DARK_GREEN;
-                            break;
+                    if (validMoves != null) {
+                        for (ChessMove move : validMoves) {
+                            if (position.equals(move.getEndPosition())) {
+                                bgColor = ((i + col) % 2 == 0) ? EscapeSequences.SET_BG_COLOR_GREEN : EscapeSequences.SET_BG_COLOR_DARK_GREEN;
+                                break;
+                            }
+                        }
+                        if (position.equals(chessPosition)) {
+                            bgColor = EscapeSequences.SET_BG_COLOR_HIGHLIGHT;
                         }
                     }
                     ChessPiece piece = board.getPiece(position);
@@ -45,10 +56,15 @@ public class BoardDrawer {
                 for (int col = 8; col > 0; col--) {
                     String bgColor = ((i + col) % 2 == 0) ? EscapeSequences.SET_BG_COLOR_LIGHT_GREY : EscapeSequences.SET_BG_COLOR_DARK_GREY;
                     ChessPosition position = new ChessPosition(rowLabel, col);
-                    for (ChessMove move : validMoves) {
-                        if (position == move.getEndPosition()) {
-                            bgColor = EscapeSequences.SET_BG_COLOR_DARK_GREEN;
-                            break;
+                    if (validMoves != null) {
+                        for (ChessMove move : validMoves) {
+                            if (position == move.getEndPosition()) {
+                                bgColor = ((i + col) % 2 == 0) ? EscapeSequences.SET_BG_COLOR_GREEN : EscapeSequences.SET_BG_COLOR_DARK_GREEN;
+                                break;
+                            }
+                        }
+                        if (position.equals(chessPosition)) {
+                            bgColor = EscapeSequences.SET_BG_COLOR_HIGHLIGHT;
                         }
                     }
                     ChessPiece piece = board.getPiece(position);
