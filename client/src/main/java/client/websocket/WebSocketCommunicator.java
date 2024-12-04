@@ -6,8 +6,6 @@ import com.google.gson.Gson;
 import exception.ServiceException;
 import websocket.commands.MakeMoveCommand;
 import websocket.commands.UserGameCommand;
-import websocket.messages.ServerMessage;
-
 import javax.websocket.*;
 import java.io.IOException;
 import java.net.URI;

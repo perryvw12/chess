@@ -23,6 +23,7 @@ import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
+import java.util.Scanner;
 
 import static ui.BoardDrawer.drawBoardBlack;
 import static ui.BoardDrawer.drawBoardWhite;
@@ -271,7 +272,16 @@ public class ChessClient implements ServerMessageObserver {
     }
 
     public String resign() throws ServiceException {
-        return "not implemented";
+        System.out.printf("%s%s%n", EscapeSequences.SET_TEXT_COLOR_RED, "Are you sure you want to resign? type yes to confirm or no to cancel");
+        Scanner scanner = new Scanner(System.in);
+        var line = scanner.nextLine();
+        line = line.toLowerCase();
+        if(line.equals("yes")) {
+            ws.resignGame(authToken, currentGameID, playerColor);
+            return "";
+        } else {
+            return "resign cancelled";
+        }
     }
 
     public String playingHelp() {
@@ -293,6 +303,7 @@ public class ChessClient implements ServerMessageObserver {
             case "NOTIFICATION":
                 var notification = new Gson().fromJson(message, NotificationMessage.class);
                 System.out.printf("%s%s%n", SET_TEXT_COLOR_GREEN, notification.getMessage());
+                System.out.print("\n" + RESET_TEXT_COLOR + ">>> " + SET_TEXT_COLOR_GREEN);
                 break;
 
             case "LOAD_GAME":
@@ -300,16 +311,17 @@ public class ChessClient implements ServerMessageObserver {
                 currentGame = loadGameMessage.getGame();
                 if (playerColor == ChessGame.TeamColor.BLACK) {
                     System.out.printf("%n%s%s%n", SET_TEXT_COLOR_BLUE, drawBoardBlack(currentGame, null));
-                    System.out.print(SET_TEXT_COLOR_LIGHT_GREY + ">>>");
+                    System.out.print("\n" + RESET_TEXT_COLOR + ">>> " + SET_TEXT_COLOR_GREEN);
                 } else {
                     System.out.printf("%n%s%s%n", SET_TEXT_COLOR_BLUE, drawBoardWhite(currentGame, null));
-                    System.out.print(SET_TEXT_COLOR_LIGHT_GREY + ">>>");
+                    System.out.print("\n" + RESET_TEXT_COLOR + ">>> " + SET_TEXT_COLOR_GREEN);
                 }
                 break;
 
             case "ERROR":
                 var error = new Gson().fromJson(message, ErrorMessage.class);
                 System.out.printf("%s%s%n", EscapeSequences.SET_TEXT_COLOR_RED, error.getErrorMessage());
+                System.out.print("\n" + RESET_TEXT_COLOR + ">>> " + SET_TEXT_COLOR_GREEN);
                 break;
         }
     }
