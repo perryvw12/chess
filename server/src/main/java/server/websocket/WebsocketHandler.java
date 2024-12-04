@@ -122,14 +122,16 @@ public class WebsocketHandler {
         var leaveCommand = new Gson().fromJson(message, UserGameCommand.class);
         var playerColor = leaveCommand.getPlayerColor();
         connections.deleteSession(username);
-
         GameData gameData = dataAccess.gameDataAccess.getGame(gameID);
-        if(playerColor.equals(ChessGame.TeamColor.WHITE)) {
-            GameData updatedGame = new GameData(gameID,null, gameData.blackUsername(), gameData.gameName(), gameData.chessGame());
-            dataAccess.gameDataAccess.updateGame(gameID, updatedGame);
-        } else if (playerColor.equals(ChessGame.TeamColor.BLACK)) {
-            GameData updatedGame = new GameData(gameID, gameData.whiteUsername(), null, gameData.gameName(), gameData.chessGame());
-            dataAccess.gameDataAccess.updateGame(gameID, updatedGame);
+
+        if (playerColor != null) {
+            if (playerColor.equals(ChessGame.TeamColor.WHITE)) {
+                GameData updatedGame = new GameData(gameID, null, gameData.blackUsername(), gameData.gameName(), gameData.chessGame());
+                dataAccess.gameDataAccess.updateGame(gameID, updatedGame);
+            } else if (playerColor.equals(ChessGame.TeamColor.BLACK)) {
+                GameData updatedGame = new GameData(gameID, gameData.whiteUsername(), null, gameData.gameName(), gameData.chessGame());
+                dataAccess.gameDataAccess.updateGame(gameID, updatedGame);
+            }
         }
 
         var notificationMessage = String.format("%s has left the game", username);

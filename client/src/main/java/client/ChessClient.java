@@ -17,7 +17,7 @@ import ui.EscapeSequences;
 import websocket.messages.ErrorMessage;
 import websocket.messages.LoadGameMessage;
 import websocket.messages.NotificationMessage;
-import websocket.messages.ServerMessage;
+
 
 import java.lang.reflect.Type;
 import java.util.ArrayList;
@@ -49,7 +49,13 @@ public class ChessClient implements ServerMessageObserver {
             var tokens = input.toLowerCase().split(" ");
             var cmd = (tokens.length > 0) ? tokens[0] : "help";
             var params = Arrays.copyOfRange(tokens, 1, tokens.length);
-            if(state == ClientState.PLAYING) {
+            if (state == ClientState.OBSERVING) {
+                return switch (cmd) {
+                    case "redraw" -> redrawBoard();
+                    case "leave" -> leaveGame();
+                    default -> observingHelp();
+                };
+            } else if(state == ClientState.PLAYING) {
                 return switch (cmd) {
                     case "redraw" -> redrawBoard();
                     case "leave" -> leaveGame();
@@ -187,14 +193,15 @@ public class ChessClient implements ServerMessageObserver {
 
     public String observeGame(String... params) throws ServiceException {
         if(params.length >= 1) {
-            int gameID;
-            try {
-                gameID = Integer.parseInt(params[0]);
-                ChessGame game = (gameList.get(gameID)).chessGame();
-                return String.format("%s%n%s", drawBoardWhite(game, null), drawBoardBlack(game, null));
-            } catch (NumberFormatException e) {
-                throw new ServiceException(400, "Invalid game number. Please provide a valid number.");
-            }
+            var gameNum = Integer.parseInt(params[0]);
+            var gameData = gameList.get(gameNum);
+            currentGame = gameData.chessGame();
+            currentGameID = gameData.gameID();
+            state = ClientState.OBSERVING;
+
+            ws = new WebSocketCommunicator(server.serverUrl, this);
+            ws.connect(authToken, currentGameID, null);
+            return "";
         }
         throw new ServiceException(400,"Expected: <GameNumber>");
     }
@@ -295,6 +302,14 @@ public class ChessClient implements ServerMessageObserver {
                 """;
     }
 
+    public String observingHelp() {
+        return """
+                - redraw - redraws the chess board
+                - leave - leaves the game
+                - help - shows list of available commands
+                """;
+    }
+
     @Override
     public void notify(String message) {
         JsonObject jsonObject = JsonParser.parseString(message).getAsJsonObject();
@@ -329,6 +344,7 @@ public class ChessClient implements ServerMessageObserver {
     private enum ClientState {
         LOGGEDOUT,
         LOGGEDIN,
-        PLAYING
+        PLAYING,
+        OBSERVING
     }
 }
