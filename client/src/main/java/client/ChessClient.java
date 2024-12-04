@@ -22,6 +22,7 @@ public class ChessClient implements ServerMessageObserver {
     String authToken = null;
     ServerFacade server;
     ClientState state = ClientState.LOGGEDOUT;
+    ChessGame.TeamColor playerColor = null;
     HashMap<Integer, GameData> gameList = new HashMap<>();
 
 
@@ -187,6 +188,37 @@ public class ChessClient implements ServerMessageObserver {
                 - logout - when you are done
                 - quit
                 - help
+                """;
+    }
+
+    public String redrawBoard() {
+        return null;
+    }
+
+    public void leaveGame() {
+
+    }
+
+    public void movePiece() {
+
+    }
+
+    public String highlightMoves() {
+        return null;
+    }
+
+    public void resign() {
+
+    }
+
+    public String playingHelp() {
+        return """
+                - redraw - redraws the chess board
+                - leave - leaves the game
+                - move <Piece position> <position to move to> - moves a chess piece
+                - highlight <piece location> - shows the possible moves for a piece
+                - resign - forfeits the game
+                - help - shows list of available commands
                 """;
     }
 
