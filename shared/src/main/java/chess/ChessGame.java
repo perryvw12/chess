@@ -13,6 +13,7 @@ import java.util.Objects;
 public class ChessGame {
     private TeamColor turn = TeamColor.WHITE;
     private ChessBoard board = new ChessBoard();
+    private boolean gameInProgress = true;
 
     public ChessGame() {
         board.resetBoard();
@@ -32,6 +33,14 @@ public class ChessGame {
      */
     public void setTeamTurn(TeamColor team) {
         turn = team;
+    }
+
+    public boolean isGameInProgress() {
+        return gameInProgress;
+    }
+
+    public void setGameInProgress(boolean gameInProgress) {
+        this.gameInProgress = gameInProgress;
     }
 
     /**
