@@ -1,12 +1,17 @@
 package client;
 
 import chess.ChessGame;
+import chess.ChessPosition;
 import client.websocket.ServerMessageObserver;
+import client.websocket.WebSocketCommunicator;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 import exception.ServiceException;
 import model.GameData;
 import model.UserData;
+import ui.EscapeSequences;
+import websocket.messages.ErrorMessage;
+import websocket.messages.LoadGameMessage;
 import websocket.messages.NotificationMessage;
 import websocket.messages.ServerMessage;
 
@@ -21,6 +26,7 @@ import static ui.BoardDrawer.drawBoardWhite;
 public class ChessClient implements ServerMessageObserver {
     String authToken = null;
     ServerFacade server;
+    WebSocketCommunicator ws;
     ClientState state = ClientState.LOGGEDOUT;
     ChessGame.TeamColor playerColor = null;
     Integer currentGameID = null;
@@ -42,7 +48,7 @@ public class ChessClient implements ServerMessageObserver {
                     case "redraw" -> redrawBoard();
                     case "leave" -> leaveGame();
                     case "move" -> movePiece();
-                    case "highlight" -> highlightMoves();
+                    case "highlight" -> highlightMoves(params);
                     case "resign" -> resign();
                     default -> playingHelp();
                 };
@@ -156,10 +162,12 @@ public class ChessClient implements ServerMessageObserver {
                 currentGameID = gameID;
                 currentGame = gameData.chessGame();
                 state = ClientState.PLAYING;
+                ws = new WebSocketCommunicator(server.serverUrl, this);
+                ws.connect(authToken, currentGameID);
                 if(this.playerColor == ChessGame.TeamColor.WHITE) {
-                    return String.format("%s%n", drawBoardWhite(currentGame));
+                    return String.format("%s%n", drawBoardWhite(currentGame, null));
                 } else {
-                    return String.format("%s%n", drawBoardBlack(currentGame));
+                    return String.format("%s%n", drawBoardBlack(currentGame, null));
                 }
             } catch (Exception e) {
                 throw new ServiceException(400, "Invalid game number. Please provide a valid number.");
@@ -181,7 +189,7 @@ public class ChessClient implements ServerMessageObserver {
             try {
                 gameID = Integer.parseInt(params[0]);
                 ChessGame game = (gameList.get(gameID)).chessGame();
-                return String.format("%s%n%s", drawBoardWhite(game), drawBoardBlack(game));
+                return String.format("%s%n%s", drawBoardWhite(game, null), drawBoardBlack(game, null));
             } catch (NumberFormatException e) {
                 throw new ServiceException(400, "Invalid game number. Please provide a valid number.");
             }
@@ -202,31 +210,46 @@ public class ChessClient implements ServerMessageObserver {
     }
 
     public String redrawBoard() {
-        return null;
+        return playerColor == ChessGame.TeamColor.BLACK ? drawBoardBlack(currentGame, null) : drawBoardWhite(currentGame, null);
     }
 
-    public void leaveGame() {
-
+    public String leaveGame() throws ServiceException {
+        ws.leaveGame(authToken, currentGameID);
+        ws = null;
+        state = ClientState.LOGGEDIN;
+        return "You have left the game";
     }
 
-    public void movePiece() {
-
+    public String movePiece() {
+        return "not implemented";
     }
 
-    public String highlightMoves() {
-        return null;
+    public String highlightMoves(String... params) throws ServiceException {
+        if (params.length >= 1) {
+            try {
+                String coordinates = params[0];
+                char column = Character.toLowerCase(coordinates.charAt(0));
+                int colNum = column - 'a' + 1;
+                int rowNum = Character.getNumericValue(coordinates.charAt(1));
+                ChessPosition chessPosition = new ChessPosition(rowNum, colNum);
+                return playerColor == ChessGame.TeamColor.BLACK ? drawBoardBlack(currentGame, chessPosition) : drawBoardWhite(currentGame, chessPosition);
+            } catch (Exception e) {
+                throw new ServiceException(400,"Expected: <piece location i.e. a4>");
+            }
+        }
+        throw new ServiceException(400,"Expected: <piece location i.e. a4>");
     }
 
-    public void resign() {
-
+    public String resign() throws ServiceException {
+        return "not implemented";
     }
 
     public String playingHelp() {
         return """
                 - redraw - redraws the chess board
                 - leave - leaves the game
-                - move <Piece position> <position to move to> - moves a chess piece
-                - highlight <piece location> - shows the possible moves for a piece
+                - move <Piece position i.e. a4> <position to move to i.e. a5> - moves a chess piece
+                - highlight <piece location i.e. a4> - shows the possible moves for a piece
                 - resign - forfeits the game
                 - help - shows list of available commands
                 """;
@@ -235,7 +258,24 @@ public class ChessClient implements ServerMessageObserver {
     @Override
     public void notify(ServerMessage serverMessage) {
         switch (serverMessage.getServerMessageType()) {
-            return;
+            case ServerMessage.ServerMessageType.NOTIFICATION:
+                var notification = (NotificationMessage) serverMessage;
+                System.out.printf("%s%n", notification.getMessage());
+
+            case ServerMessage.ServerMessageType.LOAD_GAME:
+                assert serverMessage instanceof LoadGameMessage;
+                var loadGameMessage = (LoadGameMessage) serverMessage;
+                currentGame = loadGameMessage.getGame();
+                if (playerColor == ChessGame.TeamColor.BLACK) {
+                    drawBoardBlack(currentGame, null);
+                } else {
+                    drawBoardWhite(currentGame, null);
+                }
+
+            case ServerMessage.ServerMessageType.ERROR:
+                assert serverMessage instanceof ErrorMessage;
+                var error = (ErrorMessage) serverMessage;
+                System.out.printf("%s%s%n", EscapeSequences.SET_TEXT_COLOR_RED, error.getErrorMessage());
         }
     }
 
