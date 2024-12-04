@@ -166,11 +166,7 @@ public class ChessClient implements ServerMessageObserver {
                 state = ClientState.PLAYING;
                 ws = new WebSocketCommunicator(server.serverUrl, this);
                 ws.connect(authToken, currentGameID);
-                if(this.playerColor == ChessGame.TeamColor.WHITE) {
-                    return String.format("%s%n", drawBoardWhite(currentGame, null));
-                } else {
-                    return String.format("%s%n", drawBoardBlack(currentGame, null));
-                }
+
             } catch (Exception e) {
                 throw new ServiceException(400, "Invalid game number. Please provide a valid number.");
             }

@@ -58,7 +58,7 @@ public class BoardDrawer {
                     ChessPosition position = new ChessPosition(rowLabel, col);
                     if (validMoves != null) {
                         for (ChessMove move : validMoves) {
-                            if (position == move.getEndPosition()) {
+                            if (position.equals(move.getEndPosition())) {
                                 bgColor = ((i + col) % 2 == 0) ? EscapeSequences.SET_BG_COLOR_GREEN : EscapeSequences.SET_BG_COLOR_DARK_GREEN;
                                 break;
                             }
