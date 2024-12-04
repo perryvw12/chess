@@ -33,11 +33,12 @@ public class WebsocketHandler {
            UserGameCommand command = new Gson().fromJson(message, UserGameCommand.class);
            String username = (dataAccess.authDataAccess.getAuth(command.getAuthToken()).username());
            Integer gameID = command.getGameID();
+           ChessGame.TeamColor playerColor = command.getPlayerColor();
 
            switch (command.getCommandType()) {
                case CONNECT -> connect(username, session, gameID);
                case MAKE_MOVE -> makeMove(command, username, gameID);
-               case LEAVE -> leave(username, gameID);
+               case LEAVE -> leave(username, gameID, playerColor);
                case RESIGN -> resign();
            }
        } catch (ServiceException | DataAccessException | IOException e) {
@@ -94,14 +95,14 @@ public class WebsocketHandler {
         }
     }
 
-    private void leave(String username, Integer gameID) throws IOException, ServiceException, DataAccessException {
+    private void leave(String username, Integer gameID, ChessGame.TeamColor playerColor) throws IOException, ServiceException, DataAccessException {
         connections.deleteSession(username);
 
         GameData gameData = dataAccess.gameDataAccess.getGame(gameID);
-        if(gameData.whiteUsername().equals(username)) {
+        if(playerColor.equals(ChessGame.TeamColor.WHITE)) {
             GameData updatedGame = new GameData(gameID,null, gameData.blackUsername(), gameData.gameName(), gameData.chessGame());
             dataAccess.gameDataAccess.updateGame(gameID, updatedGame);
-        } else if (gameData.blackUsername().equals(username)) {
+        } else if (playerColor.equals(ChessGame.TeamColor.BLACK)) {
             GameData updatedGame = new GameData(gameID, gameData.whiteUsername(), null, gameData.gameName(), gameData.chessGame());
             dataAccess.gameDataAccess.updateGame(gameID, updatedGame);
         }

@@ -165,7 +165,7 @@ public class ChessClient implements ServerMessageObserver {
                 currentGame = gameData.chessGame();
                 state = ClientState.PLAYING;
                 ws = new WebSocketCommunicator(server.serverUrl, this);
-                ws.connect(authToken, currentGameID);
+                ws.connect(authToken, currentGameID, this.playerColor);
 
             } catch (Exception e) {
                 throw new ServiceException(400, "Invalid game number. Please provide a valid number.");
@@ -212,7 +212,7 @@ public class ChessClient implements ServerMessageObserver {
     }
 
     public String leaveGame() throws ServiceException {
-        ws.leaveGame(authToken, currentGameID);
+        ws.leaveGame(authToken, currentGameID, playerColor);
         ws = null;
         state = ClientState.LOGGEDIN;
         return "You have left the game";

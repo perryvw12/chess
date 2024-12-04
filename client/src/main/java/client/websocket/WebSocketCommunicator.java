@@ -1,5 +1,6 @@
 package client.websocket;
 
+import chess.ChessGame;
 import chess.ChessMove;
 import com.google.gson.Gson;
 import exception.ServiceException;
@@ -41,9 +42,9 @@ public class WebSocketCommunicator extends Endpoint {
 
     }
 
-    public void connect(String authToken, Integer gameID) throws ServiceException {
+    public void connect(String authToken, Integer gameID, ChessGame.TeamColor playerColor) throws ServiceException {
         try {
-            var connectCommand = new UserGameCommand(UserGameCommand.CommandType.CONNECT, authToken, gameID);
+            var connectCommand = new UserGameCommand(UserGameCommand.CommandType.CONNECT, authToken, gameID, playerColor);
             this.session.getBasicRemote().sendText(new Gson().toJson(connectCommand));
         } catch (IOException e) {
             throw new ServiceException(500, e.getMessage());
@@ -59,9 +60,9 @@ public class WebSocketCommunicator extends Endpoint {
         }
     }
 
-    public void leaveGame(String authToken, Integer gameID) throws ServiceException {
+    public void leaveGame(String authToken, Integer gameID, ChessGame.TeamColor playerColor) throws ServiceException {
         try {
-            var leaveCommand = new UserGameCommand(UserGameCommand.CommandType.LEAVE, authToken, gameID);
+            var leaveCommand = new UserGameCommand(UserGameCommand.CommandType.LEAVE, authToken, gameID, playerColor);
             this.session.getBasicRemote().sendText(new Gson().toJson(leaveCommand));
             this.session.close();
         } catch (IOException e) {
@@ -69,9 +70,9 @@ public class WebSocketCommunicator extends Endpoint {
         }
     }
 
-    public void resignGame(String authToken, Integer gameID) throws ServiceException {
+    public void resignGame(String authToken, Integer gameID, ChessGame.TeamColor playerColor) throws ServiceException {
         try {
-            var resignCommand = new UserGameCommand(UserGameCommand.CommandType.RESIGN, authToken, gameID);
+            var resignCommand = new UserGameCommand(UserGameCommand.CommandType.RESIGN, authToken, gameID, playerColor);
             this.session.getBasicRemote().sendText(new Gson().toJson(resignCommand));
             this.session.close();
         } catch (IOException e) {
