@@ -51,9 +51,9 @@ public class WebSocketCommunicator extends Endpoint {
         }
     }
 
-    public void makeMove(String authToken, Integer gameID, ChessMove chessMove) throws ServiceException {
+    public void makeMove(String authToken, Integer gameID, ChessMove chessMove, ChessGame.TeamColor playerColor) throws ServiceException {
         try {
-            var makeMoveCommand = new MakeMoveCommand(UserGameCommand.CommandType.MAKE_MOVE, authToken, gameID, chessMove);
+            var makeMoveCommand = new MakeMoveCommand(UserGameCommand.CommandType.MAKE_MOVE, authToken, gameID, playerColor, chessMove);
             this.session.getBasicRemote().sendText(new Gson().toJson(makeMoveCommand));
         } catch (IOException e) {
             throw new ServiceException(500, e.getMessage());

@@ -7,6 +7,8 @@ import chess.ChessPosition;
 import client.websocket.ServerMessageObserver;
 import client.websocket.WebSocketCommunicator;
 import com.google.gson.Gson;
+import com.google.gson.JsonObject;
+import com.google.gson.JsonParser;
 import com.google.gson.reflect.TypeToken;
 import exception.ServiceException;
 import model.GameData;
@@ -24,6 +26,7 @@ import java.util.HashMap;
 
 import static ui.BoardDrawer.drawBoardBlack;
 import static ui.BoardDrawer.drawBoardWhite;
+import static ui.EscapeSequences.SET_TEXT_COLOR_BLUE;
 
 public class ChessClient implements ServerMessageObserver {
     String authToken = null;
@@ -166,7 +169,7 @@ public class ChessClient implements ServerMessageObserver {
                 state = ClientState.PLAYING;
                 ws = new WebSocketCommunicator(server.serverUrl, this);
                 ws.connect(authToken, currentGameID, this.playerColor);
-
+                return "";
             } catch (Exception e) {
                 throw new ServiceException(400, "Invalid game number. Please provide a valid number.");
             }
@@ -245,7 +248,7 @@ public class ChessClient implements ServerMessageObserver {
             }
 
             ChessMove chessMove = new ChessMove(piecePosition, movePosition, promotion);
-            ws.makeMove(authToken, currentGameID, chessMove);
+            ws.makeMove(authToken, currentGameID, chessMove, playerColor);
             return "";
         }
         throw new ServiceException(400, "Expected: <Piece position i.e. a4> <position to move to i.e. a5>");
@@ -284,24 +287,30 @@ public class ChessClient implements ServerMessageObserver {
 
     @Override
     public void notify(String message) {
-        ServerMessage serverMessage = new Gson().fromJson(message, ServerMessage.class);
-        switch (serverMessage.getServerMessageType()) {
-            case ServerMessage.ServerMessageType.NOTIFICATION:
+        JsonObject jsonObject = JsonParser.parseString(message).getAsJsonObject();
+        String messageType = jsonObject.get("serverMessageType").getAsString();
+        switch (messageType) {
+            case "NOTIFICATION":
                 var notification = new Gson().fromJson(message, NotificationMessage.class);
                 System.out.printf("%s%n", notification.getMessage());
+                break;
 
-            case ServerMessage.ServerMessageType.LOAD_GAME:
+            case "LOAD_GAME":
                 var loadGameMessage = new Gson().fromJson(message, LoadGameMessage.class);
                 currentGame = loadGameMessage.getGame();
                 if (playerColor == ChessGame.TeamColor.BLACK) {
-                    drawBoardBlack(currentGame, null);
+                    System.out.printf("%n%s%s%n", SET_TEXT_COLOR_BLUE, drawBoardBlack(currentGame, null));
+                    System.out.println(playingHelp());
                 } else {
-                    drawBoardWhite(currentGame, null);
+                    System.out.printf("%n%s%s%n", SET_TEXT_COLOR_BLUE, drawBoardWhite(currentGame, null));
+                    System.out.println(playingHelp());
                 }
+                break;
 
-            case ServerMessage.ServerMessageType.ERROR:
+            case "ERROR":
                 var error = new Gson().fromJson(message, ErrorMessage.class);
                 System.out.printf("%s%s%n", EscapeSequences.SET_TEXT_COLOR_RED, error.getErrorMessage());
+                break;
         }
     }
 

@@ -3,6 +3,8 @@ package server.websocket;
 import chess.ChessGame;
 import chess.ChessMove;
 import chess.InvalidMoveException;
+import com.google.gson.JsonObject;
+import com.google.gson.JsonParser;
 import dataaccess.DataAccess;
 import dataaccess.DataAccessException;
 import exception.ServiceException;
@@ -13,6 +15,7 @@ import org.eclipse.jetty.websocket.api.annotations.WebSocket;
 import websocket.commands.MakeMoveCommand;
 import websocket.commands.UserGameCommand;
 import com.google.gson.Gson;
+import websocket.messages.ErrorMessage;
 import websocket.messages.LoadGameMessage;
 import websocket.messages.NotificationMessage;
 import websocket.messages.ServerMessage;
@@ -30,16 +33,17 @@ public class WebsocketHandler {
     @OnWebSocketMessage
     public void onMessage(Session session, String message) throws ServiceException {
        try {
-           UserGameCommand command = new Gson().fromJson(message, UserGameCommand.class);
-           String username = (dataAccess.authDataAccess.getAuth(command.getAuthToken()).username());
-           Integer gameID = command.getGameID();
-           ChessGame.TeamColor playerColor = command.getPlayerColor();
+           JsonObject jsonObject = JsonParser.parseString(message).getAsJsonObject();
+           String commandType = jsonObject.get("commandType").getAsString();
+           String authToken = jsonObject.get("authToken").getAsString();
+           String username = (dataAccess.authDataAccess.getAuth(authToken).username());
+           Integer gameID = jsonObject.get("gameID").getAsInt();
 
-           switch (command.getCommandType()) {
-               case CONNECT -> connect(username, session, gameID);
-               case MAKE_MOVE -> makeMove(command, username, gameID);
-               case LEAVE -> leave(username, gameID, playerColor);
-               case RESIGN -> resign();
+           switch (commandType) {
+               case "CONNECT" -> connect(username, session, gameID);
+               case "MAKE_MOVE" -> makeMove(message, username, gameID);
+               case "LEAVE" -> leave(username, gameID);
+               case "RESIGN" -> resign();
            }
        } catch (ServiceException | DataAccessException | IOException e) {
            throw new ServiceException(500, e.getMessage());
@@ -58,40 +62,42 @@ public class WebsocketHandler {
         connections.broadcast(username, gameID, notification);
     }
 
-    private void makeMove(UserGameCommand command, String username, Integer gameID) throws ServiceException, DataAccessException, IOException {
-        ChessMove chessMove = ((MakeMoveCommand) command).getChessMove();
+    private void makeMove(String message, String username, Integer gameID) throws ServiceException, DataAccessException, IOException {
+        var command = new Gson().fromJson(message, MakeMoveCommand.class);
+        ChessMove chessMove = command.getChessMove();
         GameData gameData = dataAccess.gameDataAccess.getGame(gameID);
         ChessGame game = gameData.chessGame();
 
-        try {
-            game.makeMove(chessMove);
-        } catch (InvalidMoveException e) {
-            throw new RuntimeException(e);
-        }
-        GameData updatedGame = new GameData(gameID, gameData.whiteUsername(), gameData.blackUsername(), gameData.gameName(), game);
-        dataAccess.gameDataAccess.updateGame(gameID, updatedGame);
+        var validMoves = game.validMoves(chessMove.getStartPosition());
+        if (!validMoves.contains(chessMove)) {
+            var errorMessage = new ErrorMessage(ServerMessage.ServerMessageType.ERROR, "Invalid Move");
+            connections.broadcast();
+        } else {
+            GameData updatedGame = new GameData(gameID, gameData.whiteUsername(), gameData.blackUsername(), gameData.gameName(), game);
+            dataAccess.gameDataAccess.updateGame(gameID, updatedGame);
 
-        var loadGameMessage = new LoadGameMessage(ServerMessage.ServerMessageType.LOAD_GAME, game);
-        connections.broadcast(null, gameID, loadGameMessage);
+            var loadGameMessage = new LoadGameMessage(ServerMessage.ServerMessageType.LOAD_GAME, game);
+            connections.broadcast(null, gameID, loadGameMessage);
 
-        var moveMessage = String.format("piece was moved from %s to %s", chessMove.getStartPosition(), chessMove.getEndPosition());
-        var moveNotification = new NotificationMessage(ServerMessage.ServerMessageType.NOTIFICATION, moveMessage);
-        connections.broadcast(username, gameID, moveNotification);
+            var moveMessage = String.format("piece was moved from %s to %s", chessMove.getStartPosition(), chessMove.getEndPosition());
+            var moveNotification = new NotificationMessage(ServerMessage.ServerMessageType.NOTIFICATION, moveMessage);
+            connections.broadcast(username, gameID, moveNotification);
 
-        String statusMessage = null;
-        if(game.isInCheckmate(ChessGame.TeamColor.BLACK)) {
-            statusMessage = String.format("%s has been checkmated", gameData.blackUsername());
-        } else if (game.isInCheckmate(ChessGame.TeamColor.WHITE)) {
-            statusMessage = String.format("%s has been checkmated", gameData.whiteUsername());
-        } else if (game.isInCheck(ChessGame.TeamColor.BLACK)) {
-            statusMessage = String.format("%s is in check", gameData.blackUsername());
-        } else if (game.isInCheck(ChessGame.TeamColor.WHITE)) {
-            statusMessage = String.format("%s is in check", gameData.whiteUsername());
-        }
+            String statusMessage = null;
+            if (game.isInCheckmate(ChessGame.TeamColor.BLACK)) {
+                statusMessage = String.format("%s has been checkmated", gameData.blackUsername());
+            } else if (game.isInCheckmate(ChessGame.TeamColor.WHITE)) {
+                statusMessage = String.format("%s has been checkmated", gameData.whiteUsername());
+            } else if (game.isInCheck(ChessGame.TeamColor.BLACK)) {
+                statusMessage = String.format("%s is in check", gameData.blackUsername());
+            } else if (game.isInCheck(ChessGame.TeamColor.WHITE)) {
+                statusMessage = String.format("%s is in check", gameData.whiteUsername());
+            }
 
-        if(statusMessage != null) {
-            var statusNotification = new NotificationMessage(ServerMessage.ServerMessageType.NOTIFICATION, statusMessage);
-            connections.broadcast(null, gameID, statusNotification);
+            if (statusMessage != null) {
+                var statusNotification = new NotificationMessage(ServerMessage.ServerMessageType.NOTIFICATION, statusMessage);
+                connections.broadcast(null, gameID, statusNotification);
+            }
         }
     }
 
