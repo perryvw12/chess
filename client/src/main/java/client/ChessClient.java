@@ -1,6 +1,8 @@
 package client;
 
 import chess.ChessGame;
+import chess.ChessMove;
+import chess.ChessPiece;
 import chess.ChessPosition;
 import client.websocket.ServerMessageObserver;
 import client.websocket.WebSocketCommunicator;
@@ -47,7 +49,7 @@ public class ChessClient implements ServerMessageObserver {
                 return switch (cmd) {
                     case "redraw" -> redrawBoard();
                     case "leave" -> leaveGame();
-                    case "move" -> movePiece();
+                    case "move" -> movePiece(params);
                     case "highlight" -> highlightMoves(params);
                     case "resign" -> resign();
                     default -> playingHelp();
@@ -220,8 +222,37 @@ public class ChessClient implements ServerMessageObserver {
         return "You have left the game";
     }
 
-    public String movePiece() {
-        return "not implemented";
+    public String movePiece(String... params) throws ServiceException {
+        if (params.length >= 2) {
+            ChessPiece.PieceType promotion = null;
+            String startCoordinates = params[0];
+            char startCol = Character.toLowerCase(startCoordinates.charAt(0));
+            int startColNum = startCol - 'a' + 1;
+            int startRowNum = Integer.parseInt(startCoordinates.substring(1));
+            ChessPosition piecePosition = new ChessPosition(startRowNum, startColNum);
+
+            String endCoordinates = params[1];
+            char endCol = Character.toLowerCase(endCoordinates.charAt(0));
+            int endColNum = endCol - 'a' + 1;
+            int endRowNum = Integer.parseInt(endCoordinates.substring(1));
+            ChessPosition movePosition = new ChessPosition(endRowNum, endColNum);
+
+            if (params.length >= 3) {
+                String pieceType = (params[2]).toLowerCase();
+                promotion = switch (pieceType) {
+                    case "queen" -> ChessPiece.PieceType.QUEEN;
+                    case "rook" -> ChessPiece.PieceType.ROOK;
+                    case "bishop" -> ChessPiece.PieceType.BISHOP;
+                    case "knight" -> ChessPiece.PieceType.KNIGHT;
+                    default -> throw new ServiceException(400, "Invalid promotion piece");
+                };
+            }
+
+            ChessMove chessMove = new ChessMove(piecePosition, movePosition, promotion);
+            ws.makeMove(authToken, currentGameID, chessMove);
+            return "";
+        }
+        throw new ServiceException(400, "Expected: <Piece position i.e. a4> <position to move to i.e. a5>");
     }
 
     public String highlightMoves(String... params) throws ServiceException {
@@ -256,15 +287,15 @@ public class ChessClient implements ServerMessageObserver {
     }
 
     @Override
-    public void notify(ServerMessage serverMessage) {
+    public void notify(String message) {
+        ServerMessage serverMessage = new Gson().fromJson(message, ServerMessage.class);
         switch (serverMessage.getServerMessageType()) {
             case ServerMessage.ServerMessageType.NOTIFICATION:
-                var notification = (NotificationMessage) serverMessage;
+                var notification = new Gson().fromJson(message, NotificationMessage.class);
                 System.out.printf("%s%n", notification.getMessage());
 
             case ServerMessage.ServerMessageType.LOAD_GAME:
-                assert serverMessage instanceof LoadGameMessage;
-                var loadGameMessage = (LoadGameMessage) serverMessage;
+                var loadGameMessage = new Gson().fromJson(message, LoadGameMessage.class);
                 currentGame = loadGameMessage.getGame();
                 if (playerColor == ChessGame.TeamColor.BLACK) {
                     drawBoardBlack(currentGame, null);
@@ -273,8 +304,7 @@ public class ChessClient implements ServerMessageObserver {
                 }
 
             case ServerMessage.ServerMessageType.ERROR:
-                assert serverMessage instanceof ErrorMessage;
-                var error = (ErrorMessage) serverMessage;
+                var error = new Gson().fromJson(message, ErrorMessage.class);
                 System.out.printf("%s%s%n", EscapeSequences.SET_TEXT_COLOR_RED, error.getErrorMessage());
         }
     }
