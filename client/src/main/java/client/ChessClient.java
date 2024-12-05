@@ -145,12 +145,12 @@ public class ChessClient implements ServerMessageObserver {
         HashMap<String, ArrayList<GameData>> deserializedResults = new Gson().fromJson(String.valueOf(results), type);
         ArrayList<GameData> gameDataList = deserializedResults.get("games");
         StringBuilder finalResult = new StringBuilder();
-        int IdCounter = 1;
+        int numCounter = 1;
         for (GameData gameData : gameDataList) {
-            finalResult.append(String.format("#%s Name:%s, WhitePlayer:%s, BlackPlayer:%s%n", IdCounter, gameData.gameName(),
+            finalResult.append(String.format("#%s Name:%s, WhitePlayer:%s, BlackPlayer:%s%n", numCounter, gameData.gameName(),
                     gameData.whiteUsername() != null ? gameData.whiteUsername() : "[open]",
                     gameData.blackUsername() != null ? gameData.blackUsername() : "[open]"));
-            gameList.put(IdCounter++, gameData);
+            gameList.put(numCounter++, gameData);
         }
         return finalResult.toString();
     }
