@@ -37,7 +37,7 @@ public class WebsocketHandler {
 
            switch (commandType) {
                case "CONNECT" -> connect(authToken, session, gameID);
-               case "MAKE_MOVE" -> makeMove(message, authToken, gameID);
+               case "MAKE_MOVE" -> makeMove(message, authToken, gameID, session);
                case "LEAVE" -> leave(message, authToken, gameID);
                case "RESIGN" -> resign(message, authToken, gameID);
            }
@@ -64,7 +64,7 @@ public class WebsocketHandler {
         }
     }
 
-    private void makeMove(String message, String authToken, Integer gameID) throws IOException {
+    private void makeMove(String message, String authToken, Integer gameID, Session session) throws IOException {
         try {
             String username = (dataAccess.authDataAccess.getAuth(authToken)).username();
             var command = new Gson().fromJson(message, MakeMoveCommand.class);
@@ -76,11 +76,13 @@ public class WebsocketHandler {
             if (!game.isGameInProgress()) {
                 var errorMessage = new ErrorMessage(ServerMessage.ServerMessageType.ERROR, "Game is over no moves can be made");
                 connections.broadcastSelf(authToken, errorMessage);
+                return;
             }
 
             if (!playerColor.equals(game.getTeamTurn())) {
                 var errorMessage = new ErrorMessage(ServerMessage.ServerMessageType.ERROR, "Not your turn");
                 connections.broadcastSelf(authToken, errorMessage);
+                return;
             }
 
             var validMoves = game.validMoves(chessMove.getStartPosition());
@@ -123,7 +125,8 @@ public class WebsocketHandler {
             }
         } catch (Exception e) {
             var errorMessage = new ErrorMessage(ServerMessage.ServerMessageType.ERROR, "Bad Authorization");
-            connections.broadcastSelf(authToken, errorMessage);
+            var serialized = new Gson().toJson(errorMessage);
+            session.getRemote().sendString(serialized);
         }
     }
 
@@ -131,9 +134,18 @@ public class WebsocketHandler {
         try {
             String username = (dataAccess.authDataAccess.getAuth(authToken)).username();
             var leaveCommand = new Gson().fromJson(message, UserGameCommand.class);
-            var playerColor = leaveCommand.getPlayerColor();
             connections.deleteSession(authToken);
             GameData gameData = dataAccess.gameDataAccess.getGame(gameID);
+            ChessGame.TeamColor playerColor;
+
+            if (username.equals(gameData.whiteUsername())) {
+                playerColor = ChessGame.TeamColor.WHITE;
+            } else if (username.equals(gameData.blackUsername())) {
+                playerColor = ChessGame.TeamColor.BLACK;
+            } else {
+                playerColor = null;
+            }
+
 
             if (playerColor != null) {
                 if (playerColor.equals(ChessGame.TeamColor.WHITE)) {
@@ -158,10 +170,27 @@ public class WebsocketHandler {
         try {
             String username = (dataAccess.authDataAccess.getAuth(authToken)).username();
             var resignCommand = new Gson().fromJson(message, UserGameCommand.class);
-            var playerColor = resignCommand.getPlayerColor();
             GameData gameData = dataAccess.gameDataAccess.getGame(gameID);
             ChessGame game = gameData.chessGame();
-            String notificationMessage = "";
+            ChessGame.TeamColor playerColor;
+
+            if(!game.isGameInProgress()) {
+                var errorMessage = new ErrorMessage(ServerMessage.ServerMessageType.ERROR, "game is already over");
+                connections.broadcastSelf(authToken, errorMessage);
+                return;
+            }
+
+            if (username.equals(gameData.whiteUsername())) {
+                playerColor = ChessGame.TeamColor.WHITE;
+            } else if (username.equals(gameData.blackUsername())) {
+                playerColor = ChessGame.TeamColor.BLACK;
+            } else {
+                var errorMessage = new ErrorMessage(ServerMessage.ServerMessageType.ERROR, "Observer cannot resign");
+                connections.broadcastSelf(authToken, errorMessage);
+                return;
+            }
+
+            String notificationMessage;
 
             if (playerColor.equals(ChessGame.TeamColor.WHITE)) {
                 notificationMessage = "white has resigned, black wins the game!";
