@@ -138,7 +138,7 @@ public class WebsocketHandler {
                 }
             }
         } catch (Exception e) {
-            var errorMessage = new ErrorMessage(ServerMessage.ServerMessageType.ERROR, "Bad Authorization");
+            var errorMessage = new ErrorMessage(ServerMessage.ServerMessageType.ERROR, "Invalid move");
             var serialized = new Gson().toJson(errorMessage);
             session.getRemote().sendString(serialized);
         }

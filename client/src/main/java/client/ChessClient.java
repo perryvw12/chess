@@ -53,6 +53,7 @@ public class ChessClient implements ServerMessageObserver {
                 return switch (cmd) {
                     case "redraw" -> redrawBoard();
                     case "leave" -> leaveGame();
+                    case "highlight" -> highlightMoves(params);
                     default -> observingHelp();
                 };
             } else if(state == ClientState.PLAYING) {
@@ -230,36 +231,41 @@ public class ChessClient implements ServerMessageObserver {
     }
 
     public String movePiece(String... params) throws ServiceException {
-        if (params.length >= 2) {
-            ChessPiece.PieceType promotion = null;
-            String startCoordinates = params[0];
-            char startCol = Character.toLowerCase(startCoordinates.charAt(0));
-            int startColNum = startCol - 'a' + 1;
-            int startRowNum = Integer.parseInt(startCoordinates.substring(1));
-            ChessPosition piecePosition = new ChessPosition(startRowNum, startColNum);
+        try {
+            if (params.length >= 2) {
+                ChessPiece.PieceType promotion = null;
+                String startCoordinates = params[0];
+                char startCol = Character.toLowerCase(startCoordinates.charAt(0));
+                int startColNum = startCol - 'a' + 1;
+                int startRowNum = Integer.parseInt(startCoordinates.substring(1));
+                ChessPosition piecePosition = new ChessPosition(startRowNum, startColNum);
 
-            String endCoordinates = params[1];
-            char endCol = Character.toLowerCase(endCoordinates.charAt(0));
-            int endColNum = endCol - 'a' + 1;
-            int endRowNum = Integer.parseInt(endCoordinates.substring(1));
-            ChessPosition movePosition = new ChessPosition(endRowNum, endColNum);
+                String endCoordinates = params[1];
+                char endCol = Character.toLowerCase(endCoordinates.charAt(0));
+                int endColNum = endCol - 'a' + 1;
+                int endRowNum = Integer.parseInt(endCoordinates.substring(1));
+                ChessPosition movePosition = new ChessPosition(endRowNum, endColNum);
 
-            if (params.length >= 3) {
-                String pieceType = (params[2]).toLowerCase();
-                promotion = switch (pieceType) {
-                    case "queen" -> ChessPiece.PieceType.QUEEN;
-                    case "rook" -> ChessPiece.PieceType.ROOK;
-                    case "bishop" -> ChessPiece.PieceType.BISHOP;
-                    case "knight" -> ChessPiece.PieceType.KNIGHT;
-                    default -> null;
-                };
+                if (params.length >= 3) {
+                    String pieceType = (params[2]).toLowerCase();
+                    promotion = switch (pieceType) {
+                        case "queen" -> ChessPiece.PieceType.QUEEN;
+                        case "rook" -> ChessPiece.PieceType.ROOK;
+                        case "bishop" -> ChessPiece.PieceType.BISHOP;
+                        case "knight" -> ChessPiece.PieceType.KNIGHT;
+                        default -> null;
+                    };
+                }
+
+                ChessMove chessMove = new ChessMove(piecePosition, movePosition, promotion);
+                ws.makeMove(authToken, currentGameID, chessMove, playerColor);
+                return "";
             }
-
-            ChessMove chessMove = new ChessMove(piecePosition, movePosition, promotion);
-            ws.makeMove(authToken, currentGameID, chessMove, playerColor);
-            return "";
+            throw new ServiceException(400, "Invalid input");
+        } catch (Exception e) {
+            return "invalid input";
         }
-        throw new ServiceException(400, "Expected: <Piece position i.e. a4> <position to move to i.e. a5>");
+
     }
 
     public String highlightMoves(String... params) throws ServiceException {
@@ -308,6 +314,7 @@ public class ChessClient implements ServerMessageObserver {
                 - redraw - redraws the chess board
                 - leave - leaves the game
                 - help - shows list of available commands
+                - highlight <piece location i.e. a4> - shows the possible moves for a piece
                 """;
     }
 
