@@ -50,12 +50,19 @@ public class WebsocketHandler {
         try {
             connections.saveSession(authToken, session, gameID);
             String username = (dataAccess.authDataAccess.getAuth(authToken)).username();
-
-            ChessGame game = (dataAccess.gameDataAccess.getGame(gameID)).chessGame();
+            GameData gameData = dataAccess.gameDataAccess.getGame(gameID);
+            ChessGame game = gameData.chessGame();
             var loadGameMessage = new LoadGameMessage(ServerMessage.ServerMessageType.LOAD_GAME, game);
             connections.broadcastSelf(authToken, loadGameMessage);
 
-            var message = String.format("%s has joined the game", username);
+            String message;
+            if(username.equals(gameData.whiteUsername())) {
+                message = String.format("%s has joined the game as white", username);
+            } else if (username.equals(gameData.blackUsername())) {
+                message = String.format("%s has joined the game as black", username);
+            } else {
+                message = String.format("%s has joined the game as an observer", username);
+            }
             var notification = new NotificationMessage(ServerMessage.ServerMessageType.NOTIFICATION, message);
             connections.broadcast(authToken, gameID, notification);
         } catch (Exception e) {
