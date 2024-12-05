@@ -2,11 +2,9 @@ package server.websocket;
 
 import chess.ChessGame;
 import chess.ChessMove;
-import chess.InvalidMoveException;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import dataaccess.DataAccess;
-import dataaccess.DataAccessException;
 import exception.ServiceException;
 import model.GameData;
 import org.eclipse.jetty.websocket.api.annotations.*;
@@ -48,10 +46,10 @@ public class WebsocketHandler {
        }
     }
 
-    private void connect(String authToken, Session session, Integer gameID) throws IOException, ServiceException, DataAccessException {
+    private void connect(String authToken, Session session, Integer gameID) throws IOException {
         try {
-            String username = (dataAccess.authDataAccess.getAuth(authToken)).username();
             connections.saveSession(authToken, session, gameID);
+            String username = (dataAccess.authDataAccess.getAuth(authToken)).username();
 
             ChessGame game = (dataAccess.gameDataAccess.getGame(gameID)).chessGame();
             var loadGameMessage = new LoadGameMessage(ServerMessage.ServerMessageType.LOAD_GAME, game);
@@ -59,21 +57,21 @@ public class WebsocketHandler {
 
             var message = String.format("%s has joined the game", username);
             var notification = new NotificationMessage(ServerMessage.ServerMessageType.NOTIFICATION, message);
-            connections.broadcast(username, gameID, notification);
+            connections.broadcast(authToken, gameID, notification);
         } catch (Exception e) {
             var errorMessage = new ErrorMessage(ServerMessage.ServerMessageType.ERROR, "Invalid Game");
             connections.broadcastSelf(authToken, errorMessage);
         }
     }
 
-    private void makeMove(String message, String authToken, Integer gameID) throws ServiceException, DataAccessException, IOException, InvalidMoveException {
+    private void makeMove(String message, String authToken, Integer gameID) throws IOException {
         try {
             String username = (dataAccess.authDataAccess.getAuth(authToken)).username();
             var command = new Gson().fromJson(message, MakeMoveCommand.class);
             ChessMove chessMove = command.getChessMove();
             GameData gameData = dataAccess.gameDataAccess.getGame(gameID);
             ChessGame game = gameData.chessGame();
-            var playerColor = command.getPlayerColor();
+             var playerColor = username.equals(gameData.whiteUsername()) ? ChessGame.TeamColor.WHITE : ChessGame.TeamColor.BLACK;
 
             if (!game.isGameInProgress()) {
                 var errorMessage = new ErrorMessage(ServerMessage.ServerMessageType.ERROR, "Game is over no moves can be made");
@@ -129,7 +127,7 @@ public class WebsocketHandler {
         }
     }
 
-    private void leave(String message, String authToken, Integer gameID) throws IOException, ServiceException, DataAccessException {
+    private void leave(String message, String authToken, Integer gameID) throws IOException {
         try {
             String username = (dataAccess.authDataAccess.getAuth(authToken)).username();
             var leaveCommand = new Gson().fromJson(message, UserGameCommand.class);
@@ -156,7 +154,7 @@ public class WebsocketHandler {
         }
     }
 
-    private void resign(String message, String authToken, Integer gameID) throws ServiceException, DataAccessException, IOException {
+    private void resign(String message, String authToken, Integer gameID) throws IOException {
         try {
             String username = (dataAccess.authDataAccess.getAuth(authToken)).username();
             var resignCommand = new Gson().fromJson(message, UserGameCommand.class);
