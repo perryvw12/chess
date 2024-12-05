@@ -270,7 +270,8 @@ public class ChessClient implements ServerMessageObserver {
                 int colNum = column - 'a' + 1;
                 int rowNum = Integer.parseInt(coordinates.substring(1));
                 ChessPosition chessPosition = new ChessPosition(rowNum, colNum);
-                return playerColor == ChessGame.TeamColor.BLACK ? drawBoardBlack(currentGame, chessPosition) : drawBoardWhite(currentGame, chessPosition);
+                return playerColor == ChessGame.TeamColor.BLACK ?
+                        drawBoardBlack(currentGame, chessPosition) : drawBoardWhite(currentGame, chessPosition);
             } catch (Exception e) {
                 throw new ServiceException(400,"Expected: <piece location i.e. a4>");
             }
