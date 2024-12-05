@@ -13,6 +13,8 @@ import java.net.URISyntaxException;
 import java.util.*;
 import java.util.stream.Collectors;
 
+import static passoff.server.TestFactory.getGsonBuilder;
+import static passoff.server.TestFactory.getMessageTime;
 import static websocket.messages.ServerMessage.ServerMessageType.*;
 
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
@@ -39,8 +41,8 @@ public class WebSocketTests {
 
         serverFacade = new TestServerFacade("localhost", port);
         serverFacade.clear();
-        environment = new WebsocketTestingEnvironment("localhost", port, "/ws", org.junit.jupiter.api.TestFactory.getGsonBuilder());
-        waitTime = TestFactory.getMessageTime();
+        environment = new WebsocketTestingEnvironment("localhost", port, "/ws", getGsonBuilder());
+        waitTime = getMessageTime();
     }
 
     @BeforeEach

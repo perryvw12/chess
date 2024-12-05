@@ -11,21 +11,21 @@ import java.util.concurrent.ConcurrentHashMap;
 public class ConnectionManager {
     public final ConcurrentHashMap<String, Connection> connections = new ConcurrentHashMap<>();
 
-    public void saveSession(String username, Session session, Integer gameID) {
-        var connection = new Connection(gameID, username, session);
-        connections.put(username, connection);
+    public void saveSession(String authToken, Session session, Integer gameID) {
+        var connection = new Connection(gameID, authToken, session);
+        connections.put(authToken, connection);
     }
 
-    public void deleteSession(String username) {
-        connections.remove(username);
+    public void deleteSession(String authToken) {
+        connections.remove(authToken);
     }
 
-    public void broadcast(String excludeUsername, Integer gameID, ServerMessage message) throws IOException {
+    public void broadcast(String excludeAuthToken, Integer gameID, ServerMessage message) throws IOException {
         var removeList = new ArrayList<Connection>();
         for (var c : connections.values()) {
             if (c.session.isOpen()) {
                 if (c.gameID.equals(gameID)) {
-                    if (!c.username.equals(excludeUsername)) {
+                    if (!c.authToken.equals(excludeAuthToken)) {
                         var serializedMessage = new Gson().toJson(message);
                         c.send(serializedMessage);
                     }
@@ -35,15 +35,15 @@ public class ConnectionManager {
             }
         }
         for (var c : removeList) {
-            connections.remove(c.username);
+            connections.remove(c.authToken);
         }
     }
 
-    public void broadcastSelf(String username, ServerMessage message) throws IOException {
+    public void broadcastSelf(String authToken, ServerMessage message) throws IOException {
         var removeList = new ArrayList<Connection>();
         for (var c : connections.values()) {
             if (c.session.isOpen()) {
-                if (c.username.equals(username)) {
+                if (c.authToken.equals(authToken)) {
                     var serializedMessage = new Gson().toJson(message);
                     c.send(serializedMessage);
                 }
@@ -52,7 +52,7 @@ public class ConnectionManager {
             }
         }
         for (var c : removeList) {
-            connections.remove(c.username);
+            connections.remove(c.authToken);
         }
     }
 }
