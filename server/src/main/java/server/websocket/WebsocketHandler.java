@@ -104,18 +104,25 @@ public class WebsocketHandler {
                 var loadGameMessage = new LoadGameMessage(ServerMessage.ServerMessageType.LOAD_GAME, game);
                 connections.broadcast(null, gameID, loadGameMessage);
 
-                var moveMessage = String.format("%s has made a move", username);
+                var startColNum = chessMove.getStartPosition().getColumn();
+                var startColLetter = String.valueOf((char) ('a' + startColNum - 1));
+                var startRowNum = chessMove.getStartPosition().getRow();
+
+                var endColNum = (chessMove.getEndPosition()).getColumn();
+                var endColLetter = String.valueOf((char) ('a' + endColNum - 1));
+                var endRowNum = chessMove.getEndPosition().getRow();
+                var moveMessage = String.format("%s moved a piece from %s%s to %s%s", username, startColLetter, startRowNum, endColLetter, endRowNum);
                 var moveNotification = new NotificationMessage(ServerMessage.ServerMessageType.NOTIFICATION, moveMessage);
                 connections.broadcast(authToken, gameID, moveNotification);
 
                 String statusMessage = null;
                 if (game.isInCheckmate(ChessGame.TeamColor.BLACK)) {
-                    statusMessage = String.format("%s has been checkmated, white wins!", gameData.blackUsername());
+                    statusMessage = String.format("%s has been put in checkmate, white wins!", gameData.blackUsername());
                     game.setGameInProgress(false);
                     GameData endedGameData = new GameData(gameID, gameData.whiteUsername(), gameData.blackUsername(), gameData.gameName(), game);
                     dataAccess.gameDataAccess.updateGame(gameID, endedGameData);
                 } else if (game.isInCheckmate(ChessGame.TeamColor.WHITE)) {
-                    statusMessage = String.format("%s has been checkmated, black wins!", gameData.whiteUsername());
+                    statusMessage = String.format("%s has been put in checkmate, black wins!", gameData.whiteUsername());
                     game.setGameInProgress(false);
                     GameData endedGameData = new GameData(gameID, gameData.whiteUsername(), gameData.blackUsername(), gameData.gameName(), game);
                     dataAccess.gameDataAccess.updateGame(gameID, endedGameData);

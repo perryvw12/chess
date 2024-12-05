@@ -40,13 +40,13 @@ public class BoardDrawer {
         int colIncrement = isWhitePerspective ? 1 : -1;
 
         for (int col = startCol; (isWhitePerspective ? col <= 8 : col >= 1); col += colIncrement) {
-            String bgColor = ((rowLabel + col) % 2 == 0) ? EscapeSequences.SET_BG_COLOR_LIGHT_GREY : EscapeSequences.SET_BG_COLOR_DARK_GREY;
+            String bgColor = ((rowLabel + col) % 2 == 0) ?  EscapeSequences.SET_BG_COLOR_DARK_GREY : EscapeSequences.SET_BG_COLOR_LIGHT_GREY;
             ChessPosition position = new ChessPosition(rowLabel, col);
 
             if (validMoves != null) {
                 for (ChessMove move : validMoves) {
                     if (position.equals(move.getEndPosition())) {
-                        bgColor = ((rowLabel + col) % 2 == 0) ? EscapeSequences.SET_BG_COLOR_GREEN : EscapeSequences.SET_BG_COLOR_DARK_GREEN;
+                        bgColor = ((rowLabel + col) % 2 == 0) ?  EscapeSequences.SET_BG_COLOR_DARK_GREEN : EscapeSequences.SET_BG_COLOR_GREEN;
                         break;
                     }
                 }
