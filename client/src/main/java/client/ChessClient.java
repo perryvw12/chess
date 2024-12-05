@@ -251,7 +251,7 @@ public class ChessClient implements ServerMessageObserver {
                     case "rook" -> ChessPiece.PieceType.ROOK;
                     case "bishop" -> ChessPiece.PieceType.BISHOP;
                     case "knight" -> ChessPiece.PieceType.KNIGHT;
-                    default -> throw new ServiceException(400, "Invalid promotion piece");
+                    default -> null;
                 };
             }
 
@@ -296,7 +296,7 @@ public class ChessClient implements ServerMessageObserver {
         return """
                 - redraw - redraws the chess board
                 - leave - leaves the game
-                - move <Piece position i.e. a4> <position to move to i.e. a5> - moves a chess piece
+                - move <Piece position i.e. a4> <position to move to i.e. a5> <Optional Promotion piece for pawn i.e. queen> - moves a chess piece
                 - highlight <piece location i.e. a4> - shows the possible moves for a piece
                 - resign - forfeits the game
                 - help - shows list of available commands
